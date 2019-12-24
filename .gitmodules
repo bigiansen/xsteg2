@@ -1,0 +1,6 @@
+[submodule "lib/lien"]
+	path = lib/lien
+	url = https://github.com/bigiansen/lien
+[submodule "third-party/catch2"]
+	path = third-party/catch2
+	url = https://github.com/bigiansen/catch2

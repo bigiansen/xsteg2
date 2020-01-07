@@ -254,6 +254,7 @@ void encode(main_args& args)
         std::cout << "\r[" << i << "/" << args.thresholds.size() << "]" << std::endl;
         steg.add_threshold(args.thresholds.at(i), true);
     }
+    std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
 
     std::cout << "Encoding data..." << std::endl;
     ien::img::image encoded_image = steg.write_data(
@@ -262,12 +263,52 @@ void encode(main_args& args)
         xsteg::encoding_options()
     );
 
+    std::cout << "Saving encoded image to " << *args.output_image_file << std::endl;
     encoded_image.save_to_file_png(*args.output_image_file, 9);
+
+    std::cout << "Finished!" << std::endl;
 }
 
 void decode(main_args& args)
 {
-    // ...
+    if(!args.input_image_file || !(*args.input_image_file).size())
+    {
+        throw std::invalid_argument("No input file specified");
+    }
+    if(!args.output_data_file|| !(*args.output_data_file).size())
+    {
+        throw std::invalid_argument("No output data file specified");
+    }
+    if(!args.input_data_file || !(*args.input_data_file).size())
+    {
+        throw std::invalid_argument("No input data file specied");
+    }
+    if(!args.thresholds.size())
+    {
+        throw std::invalid_argument("No thresholds specified");
+    }
+
+    ien::img::image encoded_image(*args.input_image_file);
+    xsteg::steganographer steg(encoded_image);
+    std::cout << "Applying thresholds..." << std::endl;
+    for(size_t i = 0; i < args.thresholds.size(); ++i)
+    {
+        std::cout << "\r[" << i << "/" << args.thresholds.size() << "]" << std::endl;
+        steg.add_threshold(args.thresholds.at(i), true);
+    }
+    std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
+
+    auto data = steg.read_data(xsteg::encoding_options());
+    std::ofstream ofs(*args.output_data_file, std::ios::binary);
+    if(!ofs)
+    {
+        throw std::logic_error("Could not open output data file for write");
+    }
+
+    std::cout << "Decoding data..." << std::endl;
+    ofs.write(reinterpret_cast<const char*>(data.cdata()), data.size());
+
+    std::cout << "Finished!" << std::endl;
 }
 
 void export_key_string(main_args& args)

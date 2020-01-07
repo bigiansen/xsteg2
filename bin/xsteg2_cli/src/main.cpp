@@ -3,6 +3,8 @@
 #include <xsteg/threshold.hpp>
 
 #include <algorithm>
+#include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -18,9 +20,11 @@ using namespace std::literals::string_view_literals;
 
 enum class main_mode
 {
-    UNSPECIFIED = 0,
-    ENCODE      = 1,
-    DECODE      = 2
+    UNSPECIFIED         = 0,
+    ENCODE              = 1,
+    DECODE              = 2,
+    EXPORT_KEY_FILE     = 3,
+    EXPORT_KEY_STRING   = 4
 };
 
 struct main_args
@@ -158,39 +162,47 @@ main_args parse_args(arg_iterator& argit)
     while(auto arg = argit.next_arg())
     {
         std::string l_arg = ien::strutils::to_lower(*arg);
-        if(l_arg == "-e")
+        if(l_arg == "-e" || l_arg == "--encode")
         {
             margs.mode = main_mode::ENCODE;
         }
-        else if(l_arg == "-d")
+        else if(l_arg == "-d" || l_arg == "--decode")
         {
             margs.mode = main_mode::ENCODE;
         }
-        else if(l_arg == "-ii")
+        else if(l_arg == "-xkf" || l_arg == "--export-key-file")
+        {
+            margs.mode = main_mode::EXPORT_KEY_FILE;
+        }
+        else if(l_arg == "-xks" || l_arg == "--export-ket-string")
+        {
+            margs.mode = main_mode::EXPORT_KEY_STRING;
+        }
+        else if(l_arg == "-ii" || l_arg == "--input-image")
         {
             parse_single_arg(argit, margs.input_image_file, "ii(Input Image)");
         }
-        else if(l_arg == "-oi")
+        else if(l_arg == "-oi" || l_arg == "--output-image")
         {
             parse_single_arg(argit, margs.output_image_file, "oi(Output Image)");
         }
-        else if(l_arg == "-if")
+        else if(l_arg == "-if" || l_arg == "--input-file")
         {
             parse_single_arg(argit, margs.input_data_file, "if(Input data File)");
         }
-        else if(l_arg == "-of")
+        else if(l_arg == "-of" || l_arg == "--output-file")
         {
             parse_single_arg(argit, margs.output_data_file, "of(Output data File)");
         }
-        else if(l_arg == "-kf")
+        else if(l_arg == "-kf" || l_arg == "--key_file")
         {
             parse_single_arg(argit, margs.ed_key_file, "kf(encode/decode Key File)");
         }
-        else if(l_arg == "-ks")
+        else if(l_arg == "-ks" || l_arg == "--key-string")
         {
             parse_single_arg(argit, margs.ed_key_string, "ks(encode/decode Key String)");
         }
-        else if(l_arg == "-t")
+        else if(l_arg == "-t" || l_arg == "--threshold")
         {
             parse_threshold(argit, margs);
         }
@@ -202,6 +214,69 @@ main_args parse_args(arg_iterator& argit)
     return margs;
 }
 
+void encode(main_args& args)
+{
+    // ...
+}
+
+void decode(main_args& args)
+{
+    // ...
+}
+
+void export_key_string(main_args& args)
+{
+    if(args.thresholds.size() == 0)
+    {
+        throw std::invalid_argument("No thresholds to generate key from!");
+    }
+    std::cout << xsteg::gen_thresholds_key(args.thresholds);
+}
+
+void export_key_file(main_args& args)
+{
+    if(args.thresholds.size() == 0)
+    {
+        throw std::invalid_argument("No thresholds to generate key from!");
+    }
+    if(!args.output_data_file && !args.output_data_file.value().size())
+    {
+        throw std::invalid_argument("Empty output file path!");
+    }
+    if(std::remove((*args.output_data_file).c_str()))
+    {
+        std::cout << "Overwriting key data file (" + *args.output_data_file + ")" 
+                  << std::endl;
+    }
+    std::ofstream ofs(*args.output_data_file, std::ios::out);
+    if(ofs)
+    {
+        std::string key = xsteg::gen_thresholds_key(args.thresholds);
+        ofs.write(key.data(), key.size());
+    }
+    else
+    {
+        std::invalid_argument("Could not open file ("+ *args.output_data_file +") for writing");
+    }
+}
+
+void run_xsteg(main_args& args)
+{
+    switch(args.mode)
+    {
+        case main_mode::ENCODE: 
+            { encode(args); break; }
+        case main_mode::DECODE: 
+            { decode(args); break; }
+        case main_mode::EXPORT_KEY_STRING: 
+            { export_key_string(args); break; }
+        case main_mode::EXPORT_KEY_FILE: 
+            { export_key_file(args); break; }
+        default:
+            throw std::invalid_argument("Invalid program mode!");
+    }
+}
+
 int main(int argc, char* argv[])
 {
     try
@@ -209,8 +284,7 @@ int main(int argc, char* argv[])
         const string cmd(argv[0]);
         arg_iterator argit(argc, argv);
         argit.skip(1);
-
-        main_args margs = parse_args(argit);
+        run_xsteg(parse_args(argit));
         return 0;
     }
     catch(const std::exception& e)

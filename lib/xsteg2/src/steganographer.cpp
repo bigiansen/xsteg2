@@ -19,11 +19,23 @@ static_assert(
 
 namespace xsteg
 {
-    steganographer::steganographer(const ien::img::image& img)
+    void default_init_av_map(ien::fixed_vector<pixel_availability>& map)
+    {
+        std::fill(map.begin(), map.end(), pixel_availability(-1, -1, -1, -1));
+    }
+
+    steganographer::steganographer(const ien::image& img)
         : _img(img)
         , _av_map(img.pixel_count())
     { 
-        std::fill(_av_map.begin(), _av_map.end(), pixel_availability(-1, -1, -1, -1));
+        default_init_av_map(_av_map);
+    }
+
+    steganographer::steganographer(const std::string& path)
+        : _img(ien::image(path))
+        , _av_map(_img.pixel_count())
+    {
+        default_init_av_map(_av_map);
     }
 
     void steganographer::add_threshold(const threshold& th, bool apply)
@@ -65,11 +77,12 @@ namespace xsteg
     size_t steganographer::available_size_bytes(const encoding_options& opts) const
     {
         size_t bits = 0;
+        size_t pixels = _img.pixel_count();
         if(opts.skip_pattern)
         {
             size_t pattern_idx = 0;
             for(size_t i = opts.first_pixel_offset; 
-                i < _img.pixel_count(); 
+                i < pixels; 
                 i += (opts.skip_pattern.value()[pattern_idx++]))
             {
                 const auto& av = _av_map[i];
@@ -78,7 +91,7 @@ namespace xsteg
         }
         else
         {
-            for(size_t i = opts.first_pixel_offset; i < _img.pixel_count(); ++i)
+            for(size_t i = opts.first_pixel_offset; i < pixels; ++i)
             {
                 const auto& av = _av_map[i];
                 bits += static_cast<size_t>(av.bits_r) + av.bits_g + av.bits_b + av.bits_a;
@@ -88,8 +101,6 @@ namespace xsteg
 		return result < XSTEG_STEGANOGRAPHER_HEADER_SIZE
 			? 0 
 			: result - XSTEG_STEGANOGRAPHER_HEADER_SIZE;
-
-        return result;
     }
     
     // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ ATTENTION +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -98,10 +109,7 @@ namespace xsteg
     // so i've kept it separated into lambdas.
     // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-    // Visual aid
-    #define LAMBDA auto
-
-    ien::img::image steganographer::write_data(const uint8_t* data, size_t len, const encoding_options& opts) const
+    ien::image steganographer::write_data(const uint8_t* data, size_t len, const encoding_options& opts) const
     {
         ien::runtime_assert(
             len > 0,
@@ -114,7 +122,7 @@ namespace xsteg
                 std::to_string(len) + " Available: " + std::to_string(available_size_bytes())
         );
 
-        ien::img::image result = _img;
+        ien::image result = _img;
 
         uint8_t* const r = result.data()->data_r() + opts.first_pixel_offset;
         uint8_t* const g = result.data()->data_g() + opts.first_pixel_offset;
@@ -133,7 +141,7 @@ namespace xsteg
 
         size_t current_pixel_idx = opts.first_pixel_offset;
         size_t skip_pattern_offset = 0;
-        LAMBDA next_pixel = [&]() -> void
+        auto next_pixel = [&]() -> void
         {
             auto offset = opts.skip_pattern
                 ? opts.skip_pattern.value()[skip_pattern_offset]
@@ -143,7 +151,7 @@ namespace xsteg
         };
 
         size_t processed_bits = 0;
-        LAMBDA next_bits_mask = [&](uint8_t amount) -> uint8_t
+        auto next_bits_mask = [&](uint8_t amount) -> uint8_t
         {
             ien::debug_assert(amount <= 8, "Requested too many bits!");
             uint8_t result = 0;
@@ -155,7 +163,7 @@ namespace xsteg
             return result;
         };
 
-        LAMBDA write_bits_channel = [&](uint8_t* ch, bool ignore, uint8_t bits) -> bool
+        auto write_bits_channel = [&](uint8_t* ch, bool ignore, uint8_t bits) -> bool
         {
             if(!ignore && bits > 0)
             {
@@ -195,7 +203,7 @@ namespace xsteg
 
         size_t current_pixel_idx = opts.first_pixel_offset;
         size_t skip_pattern_offset = 0;
-        LAMBDA next_pixel = [&]() -> void
+        auto next_pixel = [&]() -> void
         {
             auto offset = opts.skip_pattern
                 ? opts.skip_pattern.value()[skip_pattern_offset]
@@ -205,7 +213,7 @@ namespace xsteg
         };
 
         uint8_t current_channel = 0;
-        LAMBDA get_channel_bit = [&](uint8_t idx) -> uint8_t
+        auto get_channel_bit = [&](uint8_t idx) -> uint8_t
         {
             const uint8_t* chptr;
             switch(current_channel % 4)
@@ -220,7 +228,7 @@ namespace xsteg
             return ien::get_bit(chptr[current_pixel_idx], idx) ? 1 : 0;
         };
 
-        LAMBDA current_pxav_ignore = [&](const pixel_availability& av) -> bool
+        auto current_pxav_ignore = [&](const pixel_availability& av) -> bool
         {
             switch(current_channel % 4)
             {
@@ -233,7 +241,7 @@ namespace xsteg
             }
         };
 
-        LAMBDA current_pxav_bits = [&](const pixel_availability& av) -> uint8_t
+        auto current_pxav_bits = [&](const pixel_availability& av) -> uint8_t
         {
             switch(current_channel % 4)
             {
@@ -246,7 +254,7 @@ namespace xsteg
             }
         };
 
-        LAMBDA next_channel = [&]() -> void
+        auto next_channel = [&]() -> void
         {
             if(current_channel == 3)
             {
@@ -260,7 +268,7 @@ namespace xsteg
         };
         
         uint8_t current_bit = 0;
-        LAMBDA next_bit = [&]() -> uint8_t
+        auto next_bit = [&]() -> uint8_t
         {
             while(true)
             {
@@ -282,7 +290,7 @@ namespace xsteg
             }
         };
 
-        LAMBDA next_byte = [&]() -> uint8_t
+        auto next_byte = [&]() -> uint8_t
         {
             uint8_t result = 0;
             for(size_t i = 0; i < 8; ++i)

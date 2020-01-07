@@ -2,7 +2,7 @@
 
 #include <xsteg/steganographer.hpp>
 
-void fill_image_seq(ien::img::image& img)
+void fill_image_seq(ien::image& img)
 {
     uint8_t* const r = img.data()->data_r();
     uint8_t* const g = img.data()->data_g();
@@ -19,7 +19,7 @@ void fill_image_seq(ien::img::image& img)
 
 TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
 {
-    ien::img::image img(4096, 4096);
+    ien::image img(4096, 4096);
     fill_image_seq(img);
 
     auto threshold = xsteg::threshold(
@@ -41,7 +41,7 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
     deserunt mollit anim id est laborum.";
 
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
-    ien::img::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
+    ien::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
 
     xsteg::steganographer decode_steg(encoded_image);
     decode_steg.add_threshold(threshold);
@@ -68,7 +68,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
         );
     }
 
-    ien::img::image img(2048, 2048);
+    ien::image img(2048, 2048);
     fill_image_seq(img);
 
     xsteg::steganographer steg(img);
@@ -86,7 +86,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
     deserunt mollit anim id est laborum.";
 
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
-    ien::img::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
+    ien::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
 
     xsteg::steganographer decode_steg(encoded_image);
     for(const auto& th : thresholds)
@@ -102,7 +102,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
 
 TEST_CASE("Encode, 0 Thresholds, Must throw")
 {
-	ien::img::image img(4096, 4096);
+	ien::image img(4096, 4096);
 	fill_image_seq(img);
 
 	auto threshold = xsteg::threshold(
@@ -129,7 +129,7 @@ TEST_CASE("Encode, 0 Thresholds, Must throw")
 
 TEST_CASE("Decode, 0 Thresholds, Must throw")
 {
-	ien::img::image img(4096, 4096);
+	ien::image img(4096, 4096);
 	fill_image_seq(img);
 
 	auto threshold = xsteg::threshold(

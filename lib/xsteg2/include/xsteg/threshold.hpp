@@ -27,7 +27,7 @@ namespace xsteg
         { }
     };
 
-    void apply_threshold(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th);
+    void apply_threshold(ien::fixed_vector<pixel_availability>& map, const ien::image& img, const threshold& th);
 
     std::string gen_single_threshold_key(const threshold&);
 

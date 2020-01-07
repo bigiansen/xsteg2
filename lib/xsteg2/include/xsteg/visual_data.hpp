@@ -9,5 +9,5 @@
 
 namespace xsteg
 {
-    ien::fixed_vector<float> extract_visual_data(const ien::img::image& img, visual_data_type type);
+    ien::fixed_vector<float> extract_visual_data(const ien::image& img, visual_data_type type);
 }

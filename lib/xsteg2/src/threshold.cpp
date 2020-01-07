@@ -28,26 +28,26 @@ namespace xsteg
 		max_availability = av.ignore_b ? max_availability : std::max(av.bits_b, max_availability);
 		max_availability = av.ignore_a ? max_availability : std::max(av.bits_a, max_availability);
 
-		float mod = ((float)(1 << 7)) / 256.0F;
+		float mod = ((float)(1 << max_availability)) / 256.0F;
 		return val - std::fmod(val, mod);
 	}
 
-    void apply_threshold_chcmp(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th)
+    void apply_threshold_chcmp(ien::fixed_vector<pixel_availability>& map, const ien::image& img, const threshold& th)
     {
-        ien::img::rgba_channel channel;
+        ien::rgba_channel channel;
         switch(th.type)
         {
             case visual_data_type::CHANNEL_RED:
-                channel = ien::img::rgba_channel::R;
+                channel = ien::rgba_channel::R;
                 break;
             case visual_data_type::CHANNEL_GREEN:
-                channel = ien::img::rgba_channel::G;
+                channel = ien::rgba_channel::G;
                 break;
             case visual_data_type::CHANNEL_BLUE:
-                channel = ien::img::rgba_channel::B;
+                channel = ien::rgba_channel::B;
                 break;
             case visual_data_type::CHANNEL_ALPHA:
-                channel = ien::img::rgba_channel::A;
+                channel = ien::rgba_channel::A;
                 break;
             default:
                 throw std::logic_error("Invalid channel type");
@@ -56,7 +56,7 @@ namespace xsteg
         uint8_t thres_val = static_cast<uint8_t>(th.value * 255.0F);
 		thres_val = truncate_threshold_value_u8(thres_val, th.availability);
 
-        ien::fixed_vector<uint8_t> res = ien::img::channel_compare(img, channel, thres_val);
+        ien::fixed_vector<uint8_t> res = ien::image_ops::channel_compare(img, channel, thres_val);
         for(size_t i = 0; i < img.pixel_count(); ++i)
         {
             if(res[i] ^ static_cast<uint8_t>(th.inverted))
@@ -66,7 +66,7 @@ namespace xsteg
         }
     }
 
-    void apply_threshold_generic(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th)
+    void apply_threshold_generic(ien::fixed_vector<pixel_availability>& map, const ien::image& img, const threshold& th)
     {
         ien::fixed_vector<float> vdata = extract_visual_data(img, th.type);
 		float thres_val = truncate_threshold_value_f32(th.value, th.availability);
@@ -79,12 +79,12 @@ namespace xsteg
         }
     }
 
-    void apply_threshold(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th)
+    void apply_threshold(ien::fixed_vector<pixel_availability>& map, const ien::image& img, const threshold& th)
     {
-        ien::img::image img_copy = img;
+        ien::image img_copy = img;
 
         const pixel_availability& av = th.availability;
-        ien::img::truncate_channel_data(
+        ien::image_ops::truncate_channel_data(
             img_copy.data(),
             av.ignore_r ? 0 : av.bits_r,
             av.ignore_g ? 0 : av.bits_g,

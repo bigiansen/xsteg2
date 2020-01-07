@@ -117,13 +117,13 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
                     : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
                 bits[1] = sv_bit[1] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(1, 1));
                 bits[2] = sv_bit[2] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(2, 1));
                 bits[3] = sv_bit[3] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(3, 1));
             }
             else
             {
@@ -173,11 +173,12 @@ main_args parse_args(arg_iterator& argit)
         }
         else if(l_arg == "-d" || l_arg == "--decode")
         {
-            margs.mode = main_mode::ENCODE;
+            margs.mode = main_mode::DECODE;
         }
         else if(l_arg == "-xkf" || l_arg == "--export-key-file")
         {
             margs.mode = main_mode::EXPORT_KEY_FILE;
+            parse_single_arg(argit, margs.output_data_file, "-of");
         }
         else if(l_arg == "-xks" || l_arg == "--export-ket-string")
         {
@@ -246,7 +247,7 @@ void encode(main_args& args)
 
     std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});
 
-    ien::img::image input_image(*args.input_image_file);
+    ien::image input_image(*args.input_image_file);
     xsteg::steganographer steg(input_image);
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)
@@ -257,7 +258,7 @@ void encode(main_args& args)
     std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
 
     std::cout << "Encoding data..." << std::endl;
-    ien::img::image encoded_image = steg.write_data(
+    ien::image encoded_image = steg.write_data(
         reinterpret_cast<uint8_t*>(input_data.data()), 
         input_data.size(), 
         xsteg::encoding_options()
@@ -279,16 +280,12 @@ void decode(main_args& args)
     {
         throw std::invalid_argument("No output data file specified");
     }
-    if(!args.input_data_file || !(*args.input_data_file).size())
-    {
-        throw std::invalid_argument("No input data file specied");
-    }
     if(!args.thresholds.size())
     {
         throw std::invalid_argument("No thresholds specified");
     }
 
-    ien::img::image encoded_image(*args.input_image_file);
+    ien::image encoded_image(*args.input_image_file);
     xsteg::steganographer steg(encoded_image);
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)

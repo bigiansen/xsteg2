@@ -73,7 +73,7 @@ namespace xsteg
                 i += (opts.skip_pattern.value()[pattern_idx++]))
             {
                 const auto& av = _av_map[i];
-                bits += (av.bits_r + av.bits_g + av.bits_b + av.bits_a);
+                bits += static_cast<size_t>(av.bits_r) + av.bits_g + av.bits_b + av.bits_a;
             }
         }
         else
@@ -81,7 +81,7 @@ namespace xsteg
             for(size_t i = opts.first_pixel_offset; i < _img.pixel_count(); ++i)
             {
                 const auto& av = _av_map[i];
-                bits += (av.bits_r + av.bits_g + av.bits_b + av.bits_a);
+                bits += static_cast<size_t>(av.bits_r) + av.bits_g + av.bits_b + av.bits_a;
             }
         }
 		size_t result = bits / 8;
@@ -214,6 +214,7 @@ namespace xsteg
                 case 1: { chptr = g; break; }
                 case 2: { chptr = b; break; }
                 case 3: { chptr = a; break; }
+				default: throw std::invalid_argument("Invalid channel index");
             }
 
             return ien::get_bit(chptr[current_pixel_idx], idx) ? 1 : 0;

@@ -30,7 +30,7 @@ enum class main_mode
 
 struct main_args
 {
-    main_mode mode;
+    main_mode mode = main_mode::UNSPECIFIED;
     optional<string> input_image_file;
     optional<string> output_image_file;
     optional<string> input_data_file;
@@ -146,6 +146,10 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
                 std::cout << "Warning: Use of threshold values not between 0 and 1 may yield unexpected results" << std::endl;
             }
         }
+		else
+		{
+			throw std::invalid_argument("Invalid threshold value argument: Invalid characters");
+		}
 
         margs.thresholds.push_back(xsteg::threshold(
             vdt, inverted, value, {bits[0], bits[1], bits[2], bits[3]}
@@ -237,7 +241,7 @@ void encode(main_args& args)
     std::ifstream ifs(*args.input_data_file, std::ios::binary);
     if(!ifs)
     {
-        std::logic_error("Unable to open input data file!");
+        throw std::logic_error("Unable to open input data file!");
     }
 
     std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});

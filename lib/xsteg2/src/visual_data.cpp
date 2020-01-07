@@ -33,6 +33,9 @@ namespace xsteg
 
             case img::rgba_channel::A:
                 return cast_u8vec_to_f32vec(*data->cdata_a());
+
+            default:
+                throw std::logic_error("Invalid channel enum type");
         }
     }
 
@@ -66,6 +69,9 @@ namespace xsteg
 
             case visual_data_type::CHANNEL_SUM_SATURATED:
                 return cast_u8vec_to_f32vec(img::rgba_sum_saturated(img));
+
+            default:
+                throw std::logic_error("Invalid visual_data_type enum type");
         }
     }
 }

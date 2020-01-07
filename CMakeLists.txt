@@ -4,6 +4,7 @@ project(xsteg2 LANGUAGES CXX C)
 
 include(cmake/xsteg2.cmake)
 
+option(XSTEG2_BUILD_CLI_EXECUTABLE "Build CLI executable" On)
 option(XSTEG2_BUILD_TESTS "Build tests" On)
 
 XSTEG2_SET_SHARED_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/shared)
@@ -36,3 +37,7 @@ if(XSTEG2_BUILD_TESTS)
 endif()
 
 add_subdirectory("lib")
+
+if(XSTEG2_BUILD_CLI_EXECUTABLE)
+    add_subdirectory("bin")
+endif()

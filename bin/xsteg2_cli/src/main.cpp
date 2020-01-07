@@ -1,14 +1,20 @@
+#include <ien/strutils.hpp>
 #include <xsteg/availability.hpp>
+#include <xsteg/threshold.hpp>
 
+#include <algorithm>
 #include <iostream>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include "arg_iterator.hpp"
 
 using std::optional;
 using std::string;
+using namespace std::literals::string_view_literals;
 
 enum class main_mode
 {
@@ -26,17 +32,189 @@ struct main_args
     optional<string> output_data_file;
     optional<string> ed_key_file;
     optional<string> ed_key_string;
-    std::vector<xsteg::pixel_availability> thresholds;
+    std::vector<xsteg::threshold> thresholds;
 };
+
+const std::unordered_map<std::string_view, xsteg::visual_data_type> vdt_dict = {
+    { "channel_red"sv,    xsteg::visual_data_type::CHANNEL_RED },
+    { "channel_green"sv,  xsteg::visual_data_type::CHANNEL_GREEN },
+    { "channel_blue"sv,   xsteg::visual_data_type::CHANNEL_BLUE },
+    { "channel_alpha"sv,  xsteg::visual_data_type::CHANNEL_ALPHA },
+    { "red"sv,            xsteg::visual_data_type::CHANNEL_RED },
+    { "green"sv,          xsteg::visual_data_type::CHANNEL_GREEN },
+    { "blue"sv,           xsteg::visual_data_type::CHANNEL_BLUE },
+    { "alpha"sv,          xsteg::visual_data_type::CHANNEL_ALPHA },
+    { "average_rgb"sv,    xsteg::visual_data_type::AVERAGE_RGB },
+    { "avg_rgb"sv,        xsteg::visual_data_type::AVERAGE_RGB },
+    { "average_rgba"sv,   xsteg::visual_data_type::AVERAGE_RGBA },
+    { "avg_rgba"sv,       xsteg::visual_data_type::AVERAGE_RGBA },
+    { "saturation"sv,     xsteg::visual_data_type::SATURATION },
+    { "sat"sv,            xsteg::visual_data_type::SATURATION },
+    { "luminance"sv,      xsteg::visual_data_type::LUMINANCE },
+    { "lum"sv,            xsteg::visual_data_type::LUMINANCE }
+};
+
+void parse_single_arg(arg_iterator& argit, optional<string>& target, const std::string& alias)
+{
+    auto arg = argit.next_arg();
+    if(arg)
+    {
+        target = *arg;
+    }
+    else
+    {
+        throw std::invalid_argument(std::string("Missing arguments for '-") + alias + "'");
+    }
+}
+
+void parse_threshold(arg_iterator& argit, main_args& margs)
+{
+    auto args = argit.next_args(4);
+    if(args)
+    {
+        std::string_view sv_vdt = ien::strutils::to_lower((*args)[0]);
+        std::string_view sv_inv = ien::strutils::to_lower((*args)[1]);
+        std::string_view sv_bit = ien::strutils::to_lower((*args)[2]);
+        std::string_view sv_val = (*args)[3];
+
+        xsteg::visual_data_type vdt;
+        bool inverted;
+        int8_t bits[4];
+        float value;
+
+        if(vdt_dict.count(sv_vdt))
+        {
+            vdt = vdt_dict.at(sv_vdt);
+        }
+        else
+        {
+            throw std::invalid_argument(std::string("Invalid threshold visual data argument: ") + std::string(sv_vdt));
+        }
+
+        if(sv_inv == "i" || sv_inv == "n")
+        {
+            inverted = (sv_inv == "i");
+        }
+        else
+        {
+            throw std::invalid_argument(std::string("Invalid threshold inversion argument: ") + std::string(sv_inv));
+        }
+        
+        if(sv_bit.size() == 4)
+        {
+            bool all_digits = std::all_of(sv_bit.begin(), sv_bit.end(), [](char ch) -> bool { 
+                return static_cast<bool>(std::isdigit(ch)) || ch == 'x'; 
+            });
+            if(all_digits)
+            {
+                bits[0] = sv_bit[0] == 'x' 
+                    ? -1 
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                bits[1] = sv_bit[1] == 'x' 
+                    ? -1 
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                bits[2] = sv_bit[2] == 'x' 
+                    ? -1 
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                bits[3] = sv_bit[3] == 'x' 
+                    ? -1 
+                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid threshold availability bits argument: Use of non-digit or 'x' characters");
+            }
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid threshold availability bits argument: Invalid size");
+        }
+        
+        bool value_digits = std::all_of(sv_val.begin(), sv_val.end(), [](char ch) -> bool {
+            return std::isdigit(ch) || ch == '.';
+        });
+        if(value_digits)
+        {
+            value = ien::strutils::string_view_to_float<float>(sv_val);
+            if(value < 0 || value > 1)
+            {
+                std::cout << "Warning: Use of threshold values not between 0 and 1 may yield unexpected results" << std::endl;
+            }
+        }
+
+        margs.thresholds.push_back(xsteg::threshold(
+            vdt, inverted, value, {bits[0], bits[1], bits[2], bits[3]}
+        ));
+    }
+    else
+    {
+        throw std::invalid_argument("Not enough arguments for threshold(-t)");
+    }
+}
+
+main_args parse_args(arg_iterator& argit)
+{
+    main_args margs;
+    while(auto arg = argit.next_arg())
+    {
+        std::string l_arg = ien::strutils::to_lower(*arg);
+        if(l_arg == "-e")
+        {
+            margs.mode = main_mode::ENCODE;
+        }
+        else if(l_arg == "-d")
+        {
+            margs.mode = main_mode::ENCODE;
+        }
+        else if(l_arg == "-ii")
+        {
+            parse_single_arg(argit, margs.input_image_file, "ii(Input Image)");
+        }
+        else if(l_arg == "-oi")
+        {
+            parse_single_arg(argit, margs.output_image_file, "oi(Output Image)");
+        }
+        else if(l_arg == "-if")
+        {
+            parse_single_arg(argit, margs.input_data_file, "if(Input data File)");
+        }
+        else if(l_arg == "-of")
+        {
+            parse_single_arg(argit, margs.output_data_file, "of(Output data File)");
+        }
+        else if(l_arg == "-kf")
+        {
+            parse_single_arg(argit, margs.ed_key_file, "kf(encode/decode Key File)");
+        }
+        else if(l_arg == "-ks")
+        {
+            parse_single_arg(argit, margs.ed_key_string, "ks(encode/decode Key String)");
+        }
+        else if(l_arg == "-t")
+        {
+            parse_threshold(argit, margs);
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid arguments!");
+        }
+    }
+    return margs;
+}
 
 int main(int argc, char* argv[])
 {
-    const string cmd(argv[0]);
-    
-    arg_iterator argit(argc, argv);
-    argit.skip(1);
+    try
+    {
+        const string cmd(argv[0]);
+        arg_iterator argit(argc, argv);
+        argit.skip(1);
 
-    // ...
-
-    return 0;
+        main_args margs = parse_args(argit);
+        return 0;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }

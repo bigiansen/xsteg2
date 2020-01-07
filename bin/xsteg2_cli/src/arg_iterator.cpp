@@ -18,7 +18,7 @@ std::optional<std::string_view> arg_iterator::next_arg()
 
 std::optional<std::vector<std::string_view>> arg_iterator::next_args(size_t count)
 {
-    if(_current_arg + count >= _args.size())
+    if(_current_arg + count > _args.size())
     {
         return std::nullopt;
     }

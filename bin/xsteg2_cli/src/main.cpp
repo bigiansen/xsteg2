@@ -1,5 +1,6 @@
 #include <ien/strutils.hpp>
 #include <xsteg/availability.hpp>
+#include <xsteg/steganographer.hpp>
 #include <xsteg/threshold.hpp>
 
 #include <algorithm>
@@ -76,9 +77,9 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
     auto args = argit.next_args(4);
     if(args)
     {
-        std::string_view sv_vdt = ien::strutils::to_lower((*args)[0]);
-        std::string_view sv_inv = ien::strutils::to_lower((*args)[1]);
-        std::string_view sv_bit = ien::strutils::to_lower((*args)[2]);
+        std::string sv_vdt = ien::strutils::to_lower((*args)[0]);
+        std::string sv_inv = ien::strutils::to_lower((*args)[1]);
+        std::string sv_bit = ien::strutils::to_lower((*args)[2]);
         std::string_view sv_val = (*args)[3];
 
         xsteg::visual_data_type vdt;
@@ -216,7 +217,48 @@ main_args parse_args(arg_iterator& argit)
 
 void encode(main_args& args)
 {
-    // ...
+    if(!args.input_image_file || !(*args.input_image_file).size())
+    {
+        throw std::invalid_argument("No input file specified");
+    }
+    if(!args.output_image_file || !(*args.output_image_file).size())
+    {
+        throw std::invalid_argument("No output image file specified");
+    }
+    if(!args.input_data_file || !(*args.input_data_file).size())
+    {
+        throw std::invalid_argument("No input data file specied");
+    }
+    if(!args.thresholds.size())
+    {
+        throw std::invalid_argument("No thresholds specified");
+    }
+
+    std::ifstream ifs(*args.input_data_file, std::ios::binary);
+    if(!ifs)
+    {
+        std::logic_error("Unable to open input data file!");
+    }
+
+    std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});
+
+    ien::img::image input_image(*args.input_image_file);
+    xsteg::steganographer steg(input_image);
+    std::cout << "Applying thresholds..." << std::endl;
+    for(size_t i = 0; i < args.thresholds.size(); ++i)
+    {
+        std::cout << "\r[" << i << "/" << args.thresholds.size() << "]" << std::endl;
+        steg.add_threshold(args.thresholds.at(i), true);
+    }
+
+    std::cout << "Encoding data..." << std::endl;
+    ien::img::image encoded_image = steg.write_data(
+        reinterpret_cast<uint8_t*>(input_data.data()), 
+        input_data.size(), 
+        xsteg::encoding_options()
+    );
+
+    encoded_image.save_to_file_png(*args.output_image_file, 9);
 }
 
 void decode(main_args& args)
@@ -239,7 +281,7 @@ void export_key_file(main_args& args)
     {
         throw std::invalid_argument("No thresholds to generate key from!");
     }
-    if(!args.output_data_file && !args.output_data_file.value().size())
+    if(!args.output_data_file || !args.output_data_file.value().size())
     {
         throw std::invalid_argument("Empty output file path!");
     }

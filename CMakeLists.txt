@@ -9,7 +9,7 @@ option(XSTEG2_BUILD_TESTS "Build tests" On)
 
 XSTEG2_SET_SHARED_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/shared)
 XSTEG2_SET_STATIC_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/static)
-XSTEG2_SET_EXECUTABLE_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/xsteg2)
+XSTEG2_SET_EXECUTABLE_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/bin/xsteg2)
 
 # Enable SSE/AVX code generation on X86 platforms
 # This should go in a toolchain, but will remain here for the moment

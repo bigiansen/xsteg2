@@ -10,6 +10,28 @@
 
 namespace xsteg
 {
+	uint8_t truncate_threshold_value_u8(uint8_t val, const pixel_availability& av)
+	{
+		uint8_t max_availability = 0;
+		max_availability = av.ignore_r ? max_availability : std::max(av.bits_r, max_availability);
+		max_availability = av.ignore_g ? max_availability : std::max(av.bits_g, max_availability);
+		max_availability = av.ignore_b ? max_availability : std::max(av.bits_b, max_availability);
+		max_availability = av.ignore_a ? max_availability : std::max(av.bits_a, max_availability);
+		return val & (0xFF << max_availability);
+	}	
+
+	float truncate_threshold_value_f32(float val, const pixel_availability& av)
+	{
+		uint8_t max_availability = 0;
+		max_availability = av.ignore_r ? max_availability : std::max(av.bits_r, max_availability);
+		max_availability = av.ignore_g ? max_availability : std::max(av.bits_g, max_availability);
+		max_availability = av.ignore_b ? max_availability : std::max(av.bits_b, max_availability);
+		max_availability = av.ignore_a ? max_availability : std::max(av.bits_a, max_availability);
+
+		float mod = ((float)(1 << 7)) / 256.0F;
+		return val - std::fmod(val, mod);
+	}
+
     void apply_threshold_chcmp(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th)
     {
         ien::img::rgba_channel channel;
@@ -32,6 +54,8 @@ namespace xsteg
         }
 
         uint8_t thres_val = static_cast<uint8_t>(th.value * 255.0F);
+		thres_val = truncate_threshold_value_u8(thres_val, th.availability);
+
         ien::fixed_vector<uint8_t> res = ien::img::channel_compare(img, channel, thres_val);
         for(size_t i = 0; i < img.pixel_count(); ++i)
         {
@@ -45,9 +69,10 @@ namespace xsteg
     void apply_threshold_generic(ien::fixed_vector<pixel_availability>& map, const ien::img::image& img, const threshold& th)
     {
         ien::fixed_vector<float> vdata = extract_visual_data(img, th.type);
+		float thres_val = truncate_threshold_value_f32(th.value, th.availability);
         for(size_t i = 0; i < img.pixel_count(); ++i)
         {
-            if((vdata[i] >= th.value) ^ th.inverted)
+            if((vdata[i] >= thres_val) ^ th.inverted)
             {
                 map[i].merge(th.availability);
             }

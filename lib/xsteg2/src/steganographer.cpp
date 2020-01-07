@@ -29,6 +29,10 @@ namespace xsteg
     void steganographer::add_threshold(const threshold& th, bool apply)
     {
         _thresholds.push_back(th);
+        if(apply)
+        {
+            apply_threshold(_av_map, _img, th);
+        }
     }
 
     void steganographer::add_threshold(threshold&& th, bool apply)
@@ -54,6 +58,7 @@ namespace xsteg
 
     void steganographer::apply_thresholds()
     {
+        _last_processed_thres_idx = 0;
         while(apply_next_threshold()) { continue; }
     }
 

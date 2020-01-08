@@ -60,10 +60,10 @@ namespace xsteg
 
     bool steganographer::apply_next_threshold()
     {
-        if(++_last_processed_thres_idx >= _thresholds.size()) 
+        if(_last_processed_thres_idx++ >= _thresholds.size()) 
         { return false; }
 
-        threshold& th = _thresholds.at(_last_processed_thres_idx);
+        threshold& th = _thresholds.at(_last_processed_thres_idx - 1);
         apply_threshold(_av_map, _img, th);
         return true;
     }

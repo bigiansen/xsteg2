@@ -44,8 +44,7 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
     ien::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
 
     xsteg::steganographer decode_steg(encoded_image);
-    decode_steg.add_threshold(threshold);
-    decode_steg.apply_thresholds();
+    decode_steg.add_threshold(threshold, true);
 
     ien::fixed_vector<uint8_t> decoded_data = decode_steg.read_data(xsteg::encoding_options());
     std::string decoded_text(reinterpret_cast<const char*>(decoded_data.cdata()), decoded_data.size());

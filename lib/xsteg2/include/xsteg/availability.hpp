@@ -21,7 +21,7 @@ namespace xsteg
         uint8_t bits_a : 3;
         bool ignore_a  : 1;
 
-        XSTEG_RELEASE_CONSTEXPR pixel_availability(int8_t r, int8_t g, int8_t b, int8_t a)
+        LIEN_RELEASE_CONSTEXPR pixel_availability(int8_t r, int8_t g, int8_t b, int8_t a)
             : bits_r(static_cast<uint8_t>(r < 0 ? 0 : r))
             , ignore_r(r < 0)
             , bits_g(static_cast<uint8_t>(g < 0 ? 0 : g))

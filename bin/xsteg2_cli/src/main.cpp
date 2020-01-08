@@ -37,6 +37,8 @@ struct main_args
     optional<string> output_data_file;
     optional<string> ed_key_file;
     optional<string> ed_key_string;
+    optional<string> skip_pattern;
+    optional<string> first_pixel_offset;
     std::vector<xsteg::threshold> thresholds;
 };
 
@@ -212,12 +214,39 @@ main_args parse_args(arg_iterator& argit)
         {
             parse_threshold(argit, margs);
         }
+        else if(l_arg == "-sp" || l_arg == "--skip-pattern")
+        {
+            parse_single_arg(argit, margs.skip_pattern, "sp(Pixel skip pattern)");
+        }
+        else if(l_arg == "-fp" || l_arg == "--first-pixel")
+        {
+            parse_single_arg(argit, margs.first_pixel_offset, "fp(First pixel)");
+        }
         else
         {
             throw std::invalid_argument("Invalid arguments!");
         }
     }
     return margs;
+}
+
+xsteg::encoding_options extract_encoding_options(const main_args& args)
+{
+    xsteg::encoding_options e_opts;
+    if(args.first_pixel_offset)
+    {
+        e_opts.first_pixel_offset = std::stoi(*args.first_pixel_offset);
+    }
+    if(args.skip_pattern)
+    {
+        std::vector<int> skip_pattern;
+        for(auto segment : ien::strutils::split_view(*args.skip_pattern, '-'))
+        {
+            skip_pattern.push_back(ien::strutils::string_view_to_integral<int>(segment));
+        }
+    }
+
+    return e_opts;
 }
 
 void encode(main_args& args)
@@ -248,7 +277,9 @@ void encode(main_args& args)
     std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});
 
     ien::image input_image(*args.input_image_file);
+
     xsteg::steganographer steg(input_image);
+
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)
     {
@@ -261,7 +292,7 @@ void encode(main_args& args)
     ien::image encoded_image = steg.write_data(
         reinterpret_cast<uint8_t*>(input_data.data()), 
         input_data.size(), 
-        xsteg::encoding_options()
+        extract_encoding_options(args)
     );
 
     std::cout << "Saving encoded image to " << *args.output_image_file << std::endl;
@@ -287,6 +318,7 @@ void decode(main_args& args)
 
     ien::image encoded_image(*args.input_image_file);
     xsteg::steganographer steg(encoded_image);
+
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)
     {
@@ -295,7 +327,7 @@ void decode(main_args& args)
     }
     std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
 
-    auto data = steg.read_data(xsteg::encoding_options());
+    auto data = steg.read_data(extract_encoding_options(args));
     std::ofstream ofs(*args.output_data_file, std::ios::binary);
     if(!ofs)
     {

@@ -224,7 +224,7 @@ main_args parse_args(arg_iterator& argit)
         }
         else
         {
-            throw std::invalid_argument("Invalid arguments!");
+            throw std::invalid_argument("Invalid argument: " + l_arg);
         }
     }
     return margs;

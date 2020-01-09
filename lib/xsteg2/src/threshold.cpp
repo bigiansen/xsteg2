@@ -6,6 +6,7 @@
 
 #include <array>
 #include <charconv>
+#include <cmath>
 #include <sstream>
 
 namespace xsteg

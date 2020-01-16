@@ -289,7 +289,7 @@ void encode(main_args& args)
     std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
 
     std::cout << "Encoding data..." << std::endl;
-    ien::image encoded_image = steg.write_data(
+    ien::image encoded_image = steg.encode(
         reinterpret_cast<uint8_t*>(input_data.data()), 
         input_data.size(), 
         extract_encoding_options(args)
@@ -327,7 +327,7 @@ void decode(main_args& args)
     }
     std::cout << "\r[" << args.thresholds.size() << "/" << args.thresholds.size() << "]" << std::endl;
 
-    auto data = steg.read_data(extract_encoding_options(args));
+    auto data = steg.decode(extract_encoding_options(args));
     std::ofstream ofs(*args.output_data_file, std::ios::binary);
     if(!ofs)
     {
@@ -400,7 +400,8 @@ int main(int argc, char* argv[])
         const string cmd(argv[0]);
         arg_iterator argit(argc, argv);
         argit.skip(1);
-        run_xsteg(parse_args(argit));
+        auto args = parse_args(argit);
+        run_xsteg(args);
         return 0;
     }
     catch(const std::exception& e)

@@ -41,12 +41,12 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
     deserunt mollit anim id est laborum.";
 
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
-    ien::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
+    ien::image encoded_image = steg.encode(data, data_text.size(), xsteg::encoding_options());
 
     xsteg::steganographer decode_steg(encoded_image);
     decode_steg.add_threshold(threshold, true);
 
-    ien::fixed_vector<uint8_t> decoded_data = decode_steg.read_data(xsteg::encoding_options());
+    ien::fixed_vector<uint8_t> decoded_data = decode_steg.decode(xsteg::encoding_options());
     std::string decoded_text(reinterpret_cast<const char*>(decoded_data.cdata()), decoded_data.size());
     REQUIRE(data_text == decoded_text);
 };
@@ -85,7 +85,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
     deserunt mollit anim id est laborum.";
 
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
-    ien::image encoded_image = steg.write_data(data, data_text.size(), xsteg::encoding_options());
+    ien::image encoded_image = steg.encode(data, data_text.size(), xsteg::encoding_options());
 
     xsteg::steganographer decode_steg(encoded_image);
     for(const auto& th : thresholds)
@@ -94,7 +94,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
     }
     decode_steg.apply_thresholds();
 
-    ien::fixed_vector<uint8_t> decoded_data = decode_steg.read_data(xsteg::encoding_options());
+    ien::fixed_vector<uint8_t> decoded_data = decode_steg.decode(xsteg::encoding_options());
     std::string decoded_text(reinterpret_cast<const char*>(decoded_data.cdata()), decoded_data.size());
     REQUIRE(data_text == decoded_text);
 };
@@ -122,7 +122,7 @@ TEST_CASE("Encode, 0 Thresholds, Must throw")
 
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
 	REQUIRE_THROWS(
-		steg.write_data(data, data_text.size(), xsteg::encoding_options())
+		steg.encode(data, data_text.size(), xsteg::encoding_options())
 	);
 };
 
@@ -149,6 +149,6 @@ TEST_CASE("Decode, 0 Thresholds, Must throw")
 
 	const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
 	REQUIRE_THROWS(
-		steg.read_data(xsteg::encoding_options())
+		steg.decode(xsteg::encoding_options())
 	);
 };

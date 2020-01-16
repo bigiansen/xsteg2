@@ -102,7 +102,7 @@ namespace xsteg
     // so i've kept it separated into lambdas.
     // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-    ien::image steganographer::write_data(const uint8_t* data, size_t len, const encoding_options& opts) const
+    ien::image steganographer::encode(const uint8_t* data, size_t len, const encoding_options& opts) const
     {
         ien::runtime_assert(
             len > 0,
@@ -183,7 +183,7 @@ namespace xsteg
         return result;
     }
 
-    ien::fixed_vector<uint8_t> steganographer::read_data(const encoding_options& opts) const
+    ien::fixed_vector<uint8_t> steganographer::decode(const encoding_options& opts) const
     {
 		ien::runtime_assert(
 			available_size_bytes(opts) > XSTEG_STEGANOGRAPHER_HEADER_SIZE,
@@ -215,7 +215,7 @@ namespace xsteg
                 case 1: { chptr = g; break; }
                 case 2: { chptr = b; break; }
                 case 3: { chptr = a; break; }
-				default: throw std::invalid_argument("Invalid channel index");
+				default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
             }
 
             return ien::get_bit(chptr[current_pixel_idx], idx) ? 1 : 0;
@@ -229,8 +229,7 @@ namespace xsteg
                 case 1: { return av.ignore_g; }
                 case 2: { return av.ignore_b; }
                 case 3: { return av.ignore_a; }
-                default:
-                    throw std::logic_error("??????????");
+                default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
             }
         };
 
@@ -242,8 +241,7 @@ namespace xsteg
                 case 1: { return av.bits_g; }
                 case 2: { return av.bits_b; }
                 case 3: { return av.bits_a; }
-                default:
-                    throw std::logic_error("??????????");
+                default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
             }
         };
 

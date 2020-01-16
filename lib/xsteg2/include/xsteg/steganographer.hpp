@@ -47,7 +47,7 @@ namespace xsteg
 
         size_t available_size_bytes(const encoding_options& = encoding_options()) const;
 
-        ien::image write_data(const uint8_t* data, size_t len, const encoding_options& opts) const;
-        ien::fixed_vector<uint8_t> read_data(const encoding_options& opts) const;
+        ien::image encode(const uint8_t* data, size_t len, const encoding_options& opts) const;
+        ien::fixed_vector<uint8_t> decode(const encoding_options& opts) const;
     };
 }

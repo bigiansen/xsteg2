@@ -31,13 +31,6 @@ namespace xsteg
         default_init_av_map(_av_map);
     }
 
-    steganographer::steganographer(const std::string& path)
-        : _img(ien::image(path))
-        , _av_map(_img.pixel_count())
-    {
-        default_init_av_map(_av_map);
-    }
-
     void steganographer::add_threshold(const threshold& th, bool apply)
     {
         _thresholds.push_back(th);

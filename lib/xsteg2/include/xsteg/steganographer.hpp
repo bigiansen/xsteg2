@@ -36,7 +36,6 @@ namespace xsteg
     
     public:
         steganographer(const ien::image& img);
-        steganographer(const std::string& path);
 
         void add_threshold(const threshold& th, bool apply = false);
         void add_threshold(threshold&& th, bool apply = false);

@@ -53,7 +53,6 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
 
 TEST_CASE("Encode - Decode 10 Thresholds")
 {
-    uint8_t vdtype = 0;
     size_t iter = 10;
     std::vector<xsteg::threshold> thresholds;
     thresholds.reserve(iter);
@@ -147,7 +146,6 @@ TEST_CASE("Decode, 0 Thresholds, Must throw")
     nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia \
     deserunt mollit anim id est laborum.";
 
-	const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
 	REQUIRE_THROWS(
 		steg.decode(xsteg::encoding_options())
 	);

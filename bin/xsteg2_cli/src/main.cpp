@@ -118,16 +118,16 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
             {
                 bits[0] = sv_bit[0] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(0, 1));
+                    : ien::strutils::to_integral<int8_t>(sv_bit.substr(0, 1));
                 bits[1] = sv_bit[1] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(1, 1));
+                    : ien::strutils::to_integral<int8_t>(sv_bit.substr(1, 1));
                 bits[2] = sv_bit[2] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(2, 1));
+                    : ien::strutils::to_integral<int8_t>(sv_bit.substr(2, 1));
                 bits[3] = sv_bit[3] == 'x' 
                     ? -1 
-                    : ien::strutils::string_view_to_integral<int8_t>(sv_bit.substr(3, 1));
+                    : ien::strutils::to_integral<int8_t>(sv_bit.substr(3, 1));
             }
             else
             {
@@ -144,7 +144,7 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
         });
         if(value_digits)
         {
-            value = ien::strutils::string_view_to_float<float>(sv_val);
+            value = ien::strutils::to_float<float>(sv_val);
             if(value < 0 || value > 1)
             {
                 std::cout << "Warning: Use of threshold values not between 0 and 1 may yield unexpected results" << std::endl;
@@ -249,7 +249,7 @@ xsteg::encoding_options extract_encoding_options(const main_args& args)
         std::vector<int> skip_pattern;
         for(auto segment : ien::strutils::split_view(*args.skip_pattern, '-'))
         {
-            skip_pattern.push_back(ien::strutils::string_view_to_integral<int>(segment));
+            skip_pattern.push_back(ien::strutils::to_integral<int>(segment));
         }
     }
 

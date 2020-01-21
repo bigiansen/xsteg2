@@ -6,7 +6,6 @@
 #include <ien/debug.hpp>
 #include <ien/fixed_vector.hpp>
 #include <ien/image.hpp>
-#include <ien/type_traits.hpp>
 
 #include <sstream>
 
@@ -34,7 +33,7 @@ namespace xsteg
     template<typename T>
     std::string gen_thresholds_key(const T& iterable)
     {
-        static_assert(ien::tt::is_iterable_of<T, threshold>, "Not a threshold container!");
+        static_assert(std::is_same_v<typename T::value_type, threshold>, "Not a threshold container!");
         if(iterable.begin() == iterable.end())
         {
             return std::string();

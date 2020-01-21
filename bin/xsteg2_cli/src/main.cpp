@@ -144,7 +144,7 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
         });
         if(value_digits)
         {
-            value = ien::strutils::to_float<float>(sv_val);
+            value = ien::strutils::to_floating_point<float>(sv_val);
             if(value < 0 || value > 1)
             {
                 std::cout << "Warning: Use of threshold values not between 0 and 1 may yield unexpected results" << std::endl;
@@ -358,7 +358,7 @@ void export_key_file(main_args& args)
     
     std::ofstream ofs(*args.output_data_file, std::ios::out);
     if(!ofs)
-        std::invalid_argument("Could not open file ("+ *args.output_data_file +") for writing");
+        throw std::invalid_argument("Could not open file ("+ *args.output_data_file +") for writing");
     
     std::string key = xsteg::gen_thresholds_key(args.thresholds);
     ofs.write(key.data(), key.size());
@@ -378,7 +378,8 @@ void gen_vdata_image(main_args& args)
     if(!vdt_dict.count(*args.visual_data_type))
         throw std::invalid_argument("Invalid visual data type argument: " + *args.visual_data_type);
 
-    xsteg::steganographer steg(ien::image(*args.input_image_file));
+    ien::image img(*args.input_image_file);
+    xsteg::steganographer steg(img);
 
     xsteg::visual_data_type vdtype = vdt_dict.at(*args.visual_data_type);
     auto result = steg.gen_visual_data_image(vdtype, false);

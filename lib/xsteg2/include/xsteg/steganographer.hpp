@@ -36,7 +36,16 @@ namespace xsteg
         int _last_processed_thres_idx = -1;
     
     public:
-        steganographer(const ien::image& img);
+        template<typename TImage>
+        steganographer(TImage&& img)
+            : _img(img)
+            , _av_map(_img.pixel_count())
+        {
+            static_assert(
+                std::is_lvalue_reference_v<std::remove_cv_t<TImage>>,
+                "Cannot bind steganographer to an rvalue or temporary"
+            );
+        }
 
         void add_threshold(const threshold& th, bool apply = false);
         void add_threshold(threshold&& th, bool apply = false);

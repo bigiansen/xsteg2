@@ -1,5 +1,6 @@
 #include <xsteg/steganographer.hpp>
 
+#include <ien/arithmetic.hpp>
 #include <ien/assert.hpp>
 #include <ien/bit_tools.hpp>
 #include <ien/image_ops.hpp>
@@ -28,13 +29,6 @@ namespace xsteg
         std::fill(map.begin(), map.end(), pixel_availability(-1, -1, -1, -1));
     }
 
-    steganographer::steganographer(const ien::image& img)
-        : _img(img)
-        , _av_map(img.pixel_count())
-    { 
-        default_init_av_map(_av_map);
-    }
-
     void steganographer::add_threshold(const threshold& th, bool apply)
     {
         _thresholds.push_back(th);
@@ -60,7 +54,7 @@ namespace xsteg
         if(_last_processed_thres_idx++ >= _thresholds.size()) 
         { return false; }
 
-        threshold& th = _thresholds.at(_last_processed_thres_idx - 1);
+        threshold& th = _thresholds.at(static_cast<signed long long>(_last_processed_thres_idx) - 1);
         apply_threshold(_av_map, _img, th);
         return true;
     }
@@ -83,7 +77,7 @@ namespace xsteg
                 i += (opts.skip_pattern.value()[pattern_idx++]))
             {
                 const auto& av = _av_map[i];
-                bits += static_cast<size_t>(av.bits_r) + av.bits_g + av.bits_b + av.bits_a;
+                bits += ien::safe_add<size_t>(av.bits_r, av.bits_g, av.bits_b, av.bits_a);
             }
         }
         else
@@ -91,7 +85,7 @@ namespace xsteg
             for(size_t i = opts.first_pixel_offset; i < pixels; ++i)
             {
                 const auto& av = _av_map[i];
-                bits += static_cast<size_t>(av.bits_r) + av.bits_g + av.bits_b + av.bits_a;
+                bits += ien::safe_add<size_t>(av.bits_r, av.bits_g, av.bits_b, av.bits_a);
             }
         }
 		size_t result = bits / 8;
@@ -219,7 +213,7 @@ namespace xsteg
                 case 1: { chptr = g; break; }
                 case 2: { chptr = b; break; }
                 case 3: { chptr = a; break; }
-				default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
+				default: { LIEN_HINT_UNREACHABLE(); } // Shush warnings
             }
 
             return ien::get_bit(chptr[current_pixel_idx], idx) ? 1 : 0;
@@ -233,7 +227,7 @@ namespace xsteg
                 case 1: { return av.ignore_g; }
                 case 2: { return av.ignore_b; }
                 case 3: { return av.ignore_a; }
-                default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
+                default: { LIEN_HINT_UNREACHABLE(); } // Shush warnings
             }
         };
 
@@ -245,7 +239,7 @@ namespace xsteg
                 case 1: { return av.bits_g; }
                 case 2: { return av.bits_b; }
                 case 3: { return av.bits_a; }
-                default: { throw std::invalid_argument("Invalid channel index"); } // Shush warnings
+                default: { LIEN_HINT_UNREACHABLE(); } // Shush warnings
             }
         };
 
@@ -318,51 +312,52 @@ namespace xsteg
     {
         ien::packed_image result(_img.width(), _img.height());
 
-        ien::fixed_vector<uint8_t> vdata(_img.pixel_count());
+        ien::fixed_vector<uint8_t> vdata(_img.pixel_count(), LIEN_DEFAULT_ALIGNMENT);
+        uint8_t* vdata_ptr = vdata.data();
         switch (type)
         {
             case visual_data_type::CHANNEL_RED: {
-                std::memcpy(vdata.data(), _img.cdata()->cdata_r(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_r(), _img.pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_GREEN: {
-                std::memcpy(vdata.data(), _img.cdata()->cdata_g(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_g(), _img.pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_BLUE: {
-                std::memcpy(vdata.data(), _img.cdata()->cdata_b(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_b(), _img.pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_ALPHA: {
-                std::memcpy(vdata.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
                 break;
             }
             case visual_data_type::AVERAGE_RGB: {
                 auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
                 break;
             }
             case visual_data_type::AVERAGE_RGBA: {
                 auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_SUM_SATURATED: {
                 auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
                 break;
             }
             case visual_data_type::LUMINANCE: {
                 ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
                 std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
-                    return static_cast<uint8_t>(f / 255.0F);
+                    return static_cast<uint8_t>(f * 255.0F);
                 });
                 break;
             }
             case visual_data_type::SATURATION: {
                 ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
                 std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
-                    return static_cast<uint8_t>(f / 255.0F);
+                    return 255 - static_cast<uint8_t>(f * 255.0F);
                 });
                 break;
             }
@@ -371,7 +366,7 @@ namespace xsteg
         for(size_t i = 0; i < vdata.size(); ++i)
         {
             uint8_t grayscale_val = inverted ? 255 - vdata[i] : vdata[i];
-            uint8_t pixel[4] = { grayscale_val, grayscale_val, grayscale_val, 0 };
+            uint8_t pixel[4] = { grayscale_val, grayscale_val, grayscale_val, 255 };
             std::memcpy(result.data() + (i * 4), pixel, 4);
         }
         return result;

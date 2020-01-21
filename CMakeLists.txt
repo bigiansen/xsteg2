@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION "3.7.0")
 
 project(xsteg2 LANGUAGES CXX C)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(cmake/xsteg2.cmake)
 
@@ -14,7 +17,7 @@ XSTEG2_SET_EXECUTABLE_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/bin/xsteg2)
 # Enable SSE/AVX code generation on X86 platforms
 # This should go in a toolchain, but will remain here for the moment
 if(XSTEG2_ARCH_X86)
-    if(MSVC)
+    if(XSTEG2_COMPILER_MSVC)
         add_definitions(/arch:AVX2)
     else()
         add_definitions(-mavx2)

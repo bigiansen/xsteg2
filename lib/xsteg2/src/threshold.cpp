@@ -202,7 +202,7 @@ namespace xsteg
                 sv_bits[2] == TH_BITS_IGNORED ? -1 : (sv_bits[2] - '0'),
                 sv_bits[3] == TH_BITS_IGNORED ? -1 : (sv_bits[3] - '0')
             );
-            float value = ien::strutils::to_float<float>(sv_tval);
+            float value = ien::strutils::to_floating_point<float>(sv_tval);
 
             result[i] = threshold(type, inverted, value, av);
         }

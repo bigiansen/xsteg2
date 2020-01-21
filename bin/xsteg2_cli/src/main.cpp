@@ -25,7 +25,8 @@ enum class main_mode
     ENCODE              = 1,
     DECODE              = 2,
     EXPORT_KEY_FILE     = 3,
-    EXPORT_KEY_STRING   = 4
+    EXPORT_KEY_STRING   = 4,
+    VISUAL_DATA_IMAGE   = 5,
 };
 
 struct main_args
@@ -39,6 +40,7 @@ struct main_args
     optional<string> ed_key_string;
     optional<string> skip_pattern;
     optional<string> first_pixel_offset;
+    optional<string> visual_data_type;
     std::vector<xsteg::threshold> thresholds;
 };
 
@@ -222,6 +224,11 @@ main_args parse_args(arg_iterator& argit)
         {
             parse_single_arg(argit, margs.first_pixel_offset, "fp(First pixel)");
         }
+        else if(l_arg == "-vd" || l_arg == "--gen-visual-data-image")
+        {
+            margs.mode = main_mode::VISUAL_DATA_IMAGE;
+            parse_single_arg(argit, margs.visual_data_type, "vd(generate Visual Data image)");
+        }
         else
         {
             throw std::invalid_argument("Invalid argument: " + l_arg);
@@ -252,27 +259,21 @@ xsteg::encoding_options extract_encoding_options(const main_args& args)
 void encode(main_args& args)
 {
     if(!args.input_image_file || !(*args.input_image_file).size())
-    {
         throw std::invalid_argument("No input file specified");
-    }
+    
     if(!args.output_image_file || !(*args.output_image_file).size())
-    {
         throw std::invalid_argument("No output image file specified");
-    }
+    
     if(!args.input_data_file || !(*args.input_data_file).size())
-    {
         throw std::invalid_argument("No input data file specied");
-    }
+    
     if(!args.thresholds.size())
-    {
         throw std::invalid_argument("No thresholds specified");
-    }
+    
 
     std::ifstream ifs(*args.input_data_file, std::ios::binary);
     if(!ifs)
-    {
         throw std::logic_error("Unable to open input data file!");
-    }
 
     std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});
 
@@ -304,17 +305,14 @@ void encode(main_args& args)
 void decode(main_args& args)
 {
     if(!args.input_image_file || !(*args.input_image_file).size())
-    {
         throw std::invalid_argument("No input file specified");
-    }
+    
     if(!args.output_data_file|| !(*args.output_data_file).size())
-    {
         throw std::invalid_argument("No output data file specified");
-    }
+    
     if(!args.thresholds.size())
-    {
         throw std::invalid_argument("No thresholds specified");
-    }
+    
 
     ien::image encoded_image(*args.input_image_file);
     xsteg::steganographer steg(encoded_image);
@@ -330,9 +328,7 @@ void decode(main_args& args)
     auto data = steg.decode(extract_encoding_options(args));
     std::ofstream ofs(*args.output_data_file, std::ios::binary);
     if(!ofs)
-    {
         throw std::logic_error("Could not open output data file for write");
-    }
 
     std::cout << "Decoding data..." << std::endl;
     ofs.write(reinterpret_cast<const char*>(data.cdata()), data.size());
@@ -343,37 +339,50 @@ void decode(main_args& args)
 void export_key_string(main_args& args)
 {
     if(args.thresholds.size() == 0)
-    {
         throw std::invalid_argument("No thresholds to generate key from!");
-    }
+    
     std::cout << xsteg::gen_thresholds_key(args.thresholds);
 }
 
 void export_key_file(main_args& args)
 {
     if(args.thresholds.size() == 0)
-    {
         throw std::invalid_argument("No thresholds to generate key from!");
-    }
+    
     if(!args.output_data_file || !args.output_data_file.value().size())
-    {
         throw std::invalid_argument("Empty output file path!");
-    }
+    
     if(std::remove((*args.output_data_file).c_str()))
-    {
         std::cout << "Overwriting key data file (" + *args.output_data_file + ")" 
                   << std::endl;
-    }
+    
     std::ofstream ofs(*args.output_data_file, std::ios::out);
-    if(ofs)
-    {
-        std::string key = xsteg::gen_thresholds_key(args.thresholds);
-        ofs.write(key.data(), key.size());
-    }
-    else
-    {
+    if(!ofs)
         std::invalid_argument("Could not open file ("+ *args.output_data_file +") for writing");
-    }
+    
+    std::string key = xsteg::gen_thresholds_key(args.thresholds);
+    ofs.write(key.data(), key.size());
+}
+
+void gen_vdata_image(main_args& args)
+{
+    if(!args.input_image_file || !args.input_image_file.value().size())
+        throw std::invalid_argument("Empty input image path!");
+
+    if(!args.output_image_file || !args.output_image_file.value().size())
+        throw std::invalid_argument("Empty output image path!");
+    
+    if(!args.visual_data_type || !args.visual_data_type.value().size())
+        throw std::invalid_argument("Empty visual data type argument!");
+    
+    if(!vdt_dict.count(*args.visual_data_type))
+        throw std::invalid_argument("Invalid visual data type argument: " + *args.visual_data_type);
+
+    xsteg::steganographer steg(ien::image(*args.input_image_file));
+
+    xsteg::visual_data_type vdtype = vdt_dict.at(*args.visual_data_type);
+    auto result = steg.gen_visual_data_image(vdtype, false);
+    result.save_to_file_png(*args.output_image_file);
 }
 
 void run_xsteg(main_args& args)
@@ -381,13 +390,25 @@ void run_xsteg(main_args& args)
     switch(args.mode)
     {
         case main_mode::ENCODE: 
-            { encode(args); break; }
+            encode(args); 
+            break;
+
         case main_mode::DECODE: 
-            { decode(args); break; }
+            decode(args); 
+            break;
+
         case main_mode::EXPORT_KEY_STRING: 
-            { export_key_string(args); break; }
+            export_key_string(args); 
+            break;
+
         case main_mode::EXPORT_KEY_FILE: 
-            { export_key_file(args); break; }
+            export_key_file(args);
+            break;
+
+        case main_mode::VISUAL_DATA_IMAGE:
+            gen_vdata_image(args);
+            break;
+
         default:
             throw std::invalid_argument("Invalid program mode!");
     }

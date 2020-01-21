@@ -2,10 +2,14 @@
 
 #include <ien/assert.hpp>
 #include <ien/bit_tools.hpp>
+#include <ien/image_ops.hpp>
 #include <ien/multi_array_bit_iterator.hpp>
 
-#ifdef XSTEG_STEGANOGRAPHER_HEADER_SIZE
-    #warn Note that using different header sizes WILL break compatibility between different compilations
+#if defined(XSTEG_STEGANOGRAPHER_HEADER_SIZE) && !defined(XSTEG_STEGANOGRAPHER_HEADER_SIZE_NOWARN)
+
+#warn "Note that using different header sizes WILL break compatibility between different compilations. \
+Define XSTEG_STEGANOGRAPHER_HEADER_SIZE_NOWARN to silence this warning"
+
 #endif
 
 #ifndef XSTEG_STEGANOGRAPHER_HEADER_SIZE
@@ -307,6 +311,69 @@ namespace xsteg
             result[i] = next_byte();
         }
 
+        return result;
+    }
+
+    ien::packed_image steganographer::gen_visual_data_image(visual_data_type type, bool inverted)
+    {
+        ien::packed_image result(_img.width(), _img.height());
+
+        ien::fixed_vector<uint8_t> vdata(_img.pixel_count());
+        switch (type)
+        {
+            case visual_data_type::CHANNEL_RED: {
+                std::memcpy(vdata.data(), _img.cdata()->cdata_r(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::CHANNEL_GREEN: {
+                std::memcpy(vdata.data(), _img.cdata()->cdata_g(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::CHANNEL_BLUE: {
+                std::memcpy(vdata.data(), _img.cdata()->cdata_b(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::CHANNEL_ALPHA: {
+                std::memcpy(vdata.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::AVERAGE_RGB: {
+                auto result = ien::image_ops::rgb_average(_img);
+                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::AVERAGE_RGBA: {
+                auto result = ien::image_ops::rgb_average(_img);
+                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::CHANNEL_SUM_SATURATED: {
+                auto result = ien::image_ops::rgb_average(_img);
+                std::memcpy(result.data(), _img.cdata()->cdata_a(), _img.pixel_count());
+                break;
+            }
+            case visual_data_type::LUMINANCE: {
+                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
+                std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
+                    return static_cast<uint8_t>(f / 255.0F);
+                });
+                break;
+            }
+            case visual_data_type::SATURATION: {
+                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
+                std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
+                    return static_cast<uint8_t>(f / 255.0F);
+                });
+                break;
+            }
+        }
+
+        for(size_t i = 0; i < vdata.size(); ++i)
+        {
+            uint8_t grayscale_val = inverted ? 255 - vdata[i] : vdata[i];
+            uint8_t pixel[4] = { grayscale_val, grayscale_val, grayscale_val, 0 };
+            std::memcpy(result.data() + (i * 4), pixel, 4);
+        }
         return result;
     }
 }

@@ -5,6 +5,7 @@
 
 #include <ien/fixed_vector.hpp>
 #include <ien/image.hpp>
+#include <ien/packed_image.hpp>
 
 #include <optional>
 #include <vector>
@@ -49,5 +50,7 @@ namespace xsteg
 
         ien::image encode(const uint8_t* data, size_t len, const encoding_options& opts) const;
         ien::fixed_vector<uint8_t> decode(const encoding_options& opts) const;
+
+        ien::packed_image gen_visual_data_image(visual_data_type type, bool inverted);
     };
 }

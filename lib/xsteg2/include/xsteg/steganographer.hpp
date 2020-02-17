@@ -8,6 +8,7 @@
 #include <ien/packed_image.hpp>
 
 #include <optional>
+#include <variant>
 #include <vector>
 
 namespace xsteg
@@ -29,23 +30,16 @@ namespace xsteg
     class steganographer
     {
     private:
-        const ien::image& _img;
+        std::variant<const ien::image, const ien::image*> _img;
         std::vector<threshold> _thresholds;
         ien::fixed_vector<pixel_availability> _av_map;
 
         int _last_processed_thres_idx = -1;
     
     public:
-        template<typename TImage>
-        steganographer(TImage&& img)
-            : _img(img)
-            , _av_map(_img.pixel_count())
-        {
-            static_assert(
-                std::is_lvalue_reference_v<std::remove_cv_t<TImage>>,
-                "Cannot bind steganographer to an rvalue or temporary"
-            );
-        }
+        steganographer(const char* filename);
+        steganographer(const std::string& filename);
+        steganographer(const ien::image* image_ptr);
 
         void add_threshold(const threshold& th, bool apply = false);
         void add_threshold(threshold&& th, bool apply = false);
@@ -61,5 +55,7 @@ namespace xsteg
         ien::fixed_vector<uint8_t> decode(const encoding_options& opts) const;
 
         ien::packed_image gen_visual_data_image(visual_data_type type, bool inverted);
+
+        const ien::image& img() const;
     };
 }

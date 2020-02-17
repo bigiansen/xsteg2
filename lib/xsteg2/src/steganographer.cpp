@@ -6,6 +6,9 @@
 #include <ien/image_ops.hpp>
 #include <ien/multi_array_bit_iterator.hpp>
 
+#include <algorithm>
+#include <cstring>
+
 #if defined(XSTEG_STEGANOGRAPHER_HEADER_SIZE) && !defined(XSTEG_STEGANOGRAPHER_HEADER_SIZE_NOWARN)
 
 #warn "Note that using different header sizes WILL break compatibility between different compilations. \
@@ -29,12 +32,27 @@ namespace xsteg
         std::fill(map.begin(), map.end(), pixel_availability(-1, -1, -1, -1));
     }
 
+    steganographer::steganographer(const char* filename)
+        : _img(std::string(filename))
+        , _av_map(img().pixel_count())
+    { }
+
+    steganographer::steganographer(const std::string& filename)
+        : _img(filename)
+        , _av_map(img().pixel_count())
+    { }
+
+    steganographer::steganographer(const ien::image* image_ptr)
+        : _img(image_ptr)
+        , _av_map(img().pixel_count())
+    { }
+
     void steganographer::add_threshold(const threshold& th, bool apply)
     {
         _thresholds.push_back(th);
         if(apply)
         {
-            apply_threshold(_av_map, _img, th);
+            apply_threshold(_av_map, img(), th);
         }
     }
 
@@ -55,7 +73,7 @@ namespace xsteg
         { return false; }
 
         threshold& th = _thresholds.at(static_cast<signed long long>(_last_processed_thres_idx) - 1);
-        apply_threshold(_av_map, _img, th);
+        apply_threshold(_av_map, img(), th);
         return true;
     }
 
@@ -68,7 +86,7 @@ namespace xsteg
     size_t steganographer::available_size_bytes(const encoding_options& opts) const
     {
         size_t bits = 0;
-        size_t pixels = _img.pixel_count();
+        size_t pixels = img().pixel_count();
         if(opts.skip_pattern)
         {
             size_t pattern_idx = 0;
@@ -113,7 +131,7 @@ namespace xsteg
                 std::to_string(len) + " Available: " + std::to_string(available_size_bytes())
         );
 
-        ien::image result = _img;
+        ien::image result = img();
 
         uint8_t* const r = result.data()->data_r() + opts.first_pixel_offset;
         uint8_t* const g = result.data()->data_g() + opts.first_pixel_offset;
@@ -187,10 +205,10 @@ namespace xsteg
 			available_size_bytes(opts) > XSTEG_STEGANOGRAPHER_HEADER_SIZE,
 			"Specified thresholds cannot hold any data!"
 		);
-        const uint8_t* const r = _img.cdata()->cdata_r() + opts.first_pixel_offset;
-        const uint8_t* const g = _img.cdata()->cdata_g() + opts.first_pixel_offset;
-        const uint8_t* const b = _img.cdata()->cdata_b() + opts.first_pixel_offset;
-        const uint8_t* const a = _img.cdata()->cdata_a() + opts.first_pixel_offset;
+        const uint8_t* const r = img().cdata()->cdata_r() + opts.first_pixel_offset;
+        const uint8_t* const g = img().cdata()->cdata_g() + opts.first_pixel_offset;
+        const uint8_t* const b = img().cdata()->cdata_b() + opts.first_pixel_offset;
+        const uint8_t* const a = img().cdata()->cdata_a() + opts.first_pixel_offset;
 
         size_t current_pixel_idx = opts.first_pixel_offset;
         size_t skip_pattern_offset = 0;
@@ -310,52 +328,52 @@ namespace xsteg
 
     ien::packed_image steganographer::gen_visual_data_image(visual_data_type type, bool inverted)
     {
-        ien::packed_image result(_img.width(), _img.height());
+        ien::packed_image result(img().width(), img().height());
 
-        ien::fixed_vector<uint8_t> vdata(_img.pixel_count(), LIEN_DEFAULT_ALIGNMENT);
+        ien::fixed_vector<uint8_t> vdata(img().pixel_count(), LIEN_DEFAULT_ALIGNMENT);
         uint8_t* vdata_ptr = vdata.data();
         switch (type)
         {
             case visual_data_type::CHANNEL_RED: {
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_r(), _img.pixel_count());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_r(), img().pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_GREEN: {
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_g(), _img.pixel_count());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_g(), img().pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_BLUE: {
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_b(), _img.pixel_count());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_b(), img().pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_ALPHA: {
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_a(), img().pixel_count());
                 break;
             }
             case visual_data_type::AVERAGE_RGB: {
-                auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
+                auto result = ien::image_ops::rgb_average(img());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_a(), img().pixel_count());
                 break;
             }
             case visual_data_type::AVERAGE_RGBA: {
-                auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
+                auto result = ien::image_ops::rgb_average(img());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_a(), img().pixel_count());
                 break;
             }
             case visual_data_type::CHANNEL_SUM_SATURATED: {
-                auto result = ien::image_ops::rgb_average(_img);
-                std::memcpy(vdata_ptr, _img.cdata()->cdata_a(), _img.pixel_count());
+                auto result = ien::image_ops::rgb_average(img());
+                std::memcpy(vdata_ptr, img().cdata()->cdata_a(), img().pixel_count());
                 break;
             }
             case visual_data_type::LUMINANCE: {
-                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
+                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(img());
                 std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
                     return static_cast<uint8_t>(f * 255.0F);
                 });
                 break;
             }
             case visual_data_type::SATURATION: {
-                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(_img);
+                ien::fixed_vector<float> vfdata = ien::image_ops::rgb_luminance(img());
                 std::transform(vfdata.begin(), vfdata.end(), vdata.begin(), [](float f){ 
                     return 255 - static_cast<uint8_t>(f * 255.0F);
                 });
@@ -370,5 +388,12 @@ namespace xsteg
             std::memcpy(result.data() + (i * 4), pixel, 4);
         }
         return result;
+    }
+
+    const ien::image& steganographer::img() const
+    {
+        return std::holds_alternative<const ien::image>(_img)
+            ? std::get<const ien::image>(_img)
+            : *std::get<const ien::image*>(_img);
     }
 }

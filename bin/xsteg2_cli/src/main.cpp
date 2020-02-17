@@ -277,9 +277,7 @@ void encode(main_args& args)
 
     std::vector<char> input_data(std::istreambuf_iterator<char>(ifs), {});
 
-    ien::image input_image(*args.input_image_file);
-
-    xsteg::steganographer steg(input_image);
+    xsteg::steganographer steg(*args.input_image_file);
 
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)
@@ -313,9 +311,7 @@ void decode(main_args& args)
     if(!args.thresholds.size())
         throw std::invalid_argument("No thresholds specified");
     
-
-    ien::image encoded_image(*args.input_image_file);
-    xsteg::steganographer steg(encoded_image);
+    xsteg::steganographer steg(*args.input_image_file);
 
     std::cout << "Applying thresholds..." << std::endl;
     for(size_t i = 0; i < args.thresholds.size(); ++i)
@@ -378,8 +374,7 @@ void gen_vdata_image(main_args& args)
     if(!vdt_dict.count(*args.visual_data_type))
         throw std::invalid_argument("Invalid visual data type argument: " + *args.visual_data_type);
 
-    ien::image img(*args.input_image_file);
-    xsteg::steganographer steg(img);
+    xsteg::steganographer steg(*args.input_image_file);
 
     xsteg::visual_data_type vdtype = vdt_dict.at(*args.visual_data_type);
     auto result = steg.gen_visual_data_image(vdtype, false);

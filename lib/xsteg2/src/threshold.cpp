@@ -4,6 +4,7 @@
 #include <ien/strutils.hpp>
 #include <xsteg/visual_data.hpp>
 
+#include <algorithm>
 #include <array>
 #include <charconv>
 #include <cmath>
@@ -167,12 +168,14 @@ namespace xsteg
             }),
             "Invalid channel bit availability parameter format (invalid character(s))"
         );
+        
+        char* dummy;
+        float fval = std::strtof(std::string(val).c_str(), &dummy);
 
-        float dummy;
-        ien::runtime_assert(
-            std::from_chars(val.data(), val.data() + val.size(), dummy).ec != std::errc::invalid_argument,
-            "Invalid value parameter (bad format)"
-        );
+        if(fval == 0 && dummy == val.data())
+            throw std::invalid_argument("Unable to parse value parameter");
+        else if(errno == ERANGE)
+            throw std::out_of_range("Value parameter is out of representable range");
     }
 
     ien::fixed_vector<threshold> parse_thresholds_key(const std::string& key)

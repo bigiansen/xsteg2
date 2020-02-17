@@ -95,7 +95,12 @@ namespace xsteg
                 i += (opts.skip_pattern.value()[pattern_idx++]))
             {
                 const auto& av = _av_map[i];
-                bits += ien::safe_add<size_t>(av.bits_r, av.bits_g, av.bits_b, av.bits_a);
+                bits += ien::safe_add<size_t>(
+                    av.ignore_r ? 0 : av.bits_r, 
+                    av.ignore_g ? 0 : av.bits_g,
+                    av.ignore_b ? 0 : av.bits_b, 
+                    av.ignore_a ? 0 : av.bits_a
+                );
             }
         }
         else
@@ -103,7 +108,12 @@ namespace xsteg
             for(size_t i = opts.first_pixel_offset; i < pixels; ++i)
             {
                 const auto& av = _av_map[i];
-                bits += ien::safe_add<size_t>(av.bits_r, av.bits_g, av.bits_b, av.bits_a);
+                bits += ien::safe_add<size_t>(
+                    av.ignore_r ? 0 : av.bits_r,
+                    av.ignore_g ? 0 : av.bits_g,
+                    av.ignore_b ? 0 : av.bits_b,
+                    av.ignore_a ? 0 : av.bits_a
+                );
             }
         }
 		size_t result = bits / 8;

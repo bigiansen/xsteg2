@@ -1,0 +1,57 @@
+[Prefix="xsteg::"]
+interface pixel_availability
+{
+    void pixel_availability(long r, long g, long b, long a);
+};
+
+[Prefix="xsteg::"]
+interface encoding_options
+{
+    void encoding_options(long offset);
+    attribute long first_pixel_offset;
+};
+
+enum visual_data_type
+{
+    "visual_data_type::CHANNEL_RED",
+    "visual_data_type::CHANNEL_GREEN",
+    "visual_data_type::CHANNEL_BLUE",
+    "visual_data_type::CHANNEL_ALPHA",
+    "visual_data_type::AVERAGE_RGB",
+    "visual_data_type::AVERAGE_RGBA",
+    "visual_data_type::SATURATION",
+    "visual_data_type::LUMINANCE",
+    "visual_data_type::CHANNEL_SUM_SATURATED"
+};
+
+[Prefix="xsteg::"]
+interface threshold
+{
+    void threshold(visual_data_type vdt, boolean inv, float val, [Ref] pixel_availability pxav);
+};
+
+[Prefix="ien::"]
+interface image
+{
+    void image(octet[] data, long w, long h);
+    long pixel_count();
+};
+
+[Prefix="xsteg::"]
+interface steganographer
+{
+    void steganographer([Ref] image img);
+
+    void add_threshold([Ref] threshold thres, boolean apply);
+    void clear_thresholds();
+
+    long available_size_bytes([Ref] encoding_options eopts);
+
+    [Value] image encode(octet[] data, long len, [Ref] encoding_options eopts);
+};
+
+interface ex_helper
+{
+    void ex_helper();
+    [Const] DOMString get_exception_msg(long exptr);
+};

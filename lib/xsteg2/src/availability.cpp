@@ -12,4 +12,10 @@ namespace xsteg
         if(!src.ignore_b) { bits_b = src.bits_b; ignore_b = false; }
         if(!src.ignore_a) { bits_a = src.bits_a; ignore_a = false; }
     }
+
+    availability_map::availability_map(size_t len)
+        : fixed_vector(len)
+    {
+        std::fill(begin(), end(), pixel_availability(-1, -1, -1, -1));
+    }
 }

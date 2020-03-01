@@ -32,14 +32,14 @@ namespace xsteg
     private:
         std::variant<const ien::image, const ien::image*> _img;
         std::vector<threshold> _thresholds;
-        ien::fixed_vector<pixel_availability> _av_map;
+        availability_map _av_map;
 
         int _last_processed_thres_idx = -1;
     
     public:
         steganographer(const char* filename);
         steganographer(const std::string& filename);
-        steganographer(const ien::image* image_ptr);
+        steganographer(const ien::image& image);
 
         void add_threshold(const threshold& th, bool apply = false);
         void add_threshold(threshold&& th, bool apply = false);

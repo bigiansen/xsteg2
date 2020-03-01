@@ -10,10 +10,10 @@ void fill_image_seq(ien::image& img)
     uint8_t* const a = img.data()->data_a();
     for(size_t i = 0; i < img.pixel_count(); ++i)
     {
-        r[i] = static_cast<uint8_t>(i);
-        g[i] = static_cast<uint8_t>(i)+1;
-        b[i] = static_cast<uint8_t>(i)+2;
-        a[i] = static_cast<uint8_t>(i)+3;
+        r[i] = static_cast<uint8_t>(std::pow(i, 1));
+        g[i] = static_cast<uint8_t>(std::pow(i, 2));
+        b[i] = static_cast<uint8_t>(std::pow(i, 3));
+        a[i] = static_cast<uint8_t>(std::pow(i, 5));
     }
 }
 
@@ -29,7 +29,7 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
         xsteg::pixel_availability(2, 2, 2, 0)
     );
 
-    xsteg::steganographer steg(&img);
+    xsteg::steganographer steg(img);
     steg.add_threshold(threshold);
     steg.apply_thresholds();
 
@@ -43,7 +43,7 @@ TEST_CASE("Encode - Decode 4096x4096, 1 Threshold")
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
     ien::image encoded_image = steg.encode(data, data_text.size(), xsteg::encoding_options());
 
-    xsteg::steganographer decode_steg(&encoded_image);
+    xsteg::steganographer decode_steg(encoded_image);
     decode_steg.add_threshold(threshold, true);
 
     ien::fixed_vector<uint8_t> decoded_data = decode_steg.decode(xsteg::encoding_options());
@@ -69,7 +69,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
     ien::image img(2048, 2048);
     fill_image_seq(img);
 
-    xsteg::steganographer steg(&img);
+    xsteg::steganographer steg(img);
     for(const auto& th : thresholds)
     {
         steg.add_threshold(th);
@@ -86,7 +86,7 @@ TEST_CASE("Encode - Decode 10 Thresholds")
     const uint8_t* data = reinterpret_cast<const uint8_t*>(data_text.data());
     ien::image encoded_image = steg.encode(data, data_text.size(), xsteg::encoding_options());
 
-    xsteg::steganographer decode_steg(&encoded_image);
+    xsteg::steganographer decode_steg(encoded_image);
     for(const auto& th : thresholds)
     {
 		decode_steg.add_threshold(th);
@@ -110,7 +110,7 @@ TEST_CASE("Encode, 0 Thresholds, Must throw")
 		xsteg::pixel_availability(2, 2, 2, 0)
 	);
 
-	xsteg::steganographer steg(&img);
+	xsteg::steganographer steg(img);
 
 	std::string data_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, \
     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim \
@@ -137,7 +137,7 @@ TEST_CASE("Decode, 0 Thresholds, Must throw")
 		xsteg::pixel_availability(2, 2, 2, 0)
 	);
 
-	xsteg::steganographer steg(&img);
+	xsteg::steganographer steg(img);
 
 	std::string data_text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, \
     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim \

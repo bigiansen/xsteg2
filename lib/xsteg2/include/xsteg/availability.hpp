@@ -39,6 +39,11 @@ namespace xsteg
 
         void merge(const pixel_availability& src);
     };
-
+    
     static_assert(sizeof(pixel_availability) == 2);
+
+    struct availability_map : public ien::fixed_vector<pixel_availability>
+    {
+        availability_map(size_t len);
+    };
 }

@@ -42,8 +42,8 @@ namespace xsteg
         , _av_map(img().pixel_count())
     { }
 
-    steganographer::steganographer(const ien::image* image_ptr)
-        : _img(image_ptr)
+    steganographer::steganographer(const ien::image& image)
+        : _img(&image)
         , _av_map(img().pixel_count())
     { }
 
@@ -85,6 +85,9 @@ namespace xsteg
 
     size_t steganographer::available_size_bytes(const encoding_options& opts) const
     {
+        if(_thresholds.empty())
+            return 0;
+
         size_t bits = 0;
         size_t pixels = img().pixel_count();
         if(opts.skip_pattern)

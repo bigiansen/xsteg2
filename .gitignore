@@ -4,3 +4,5 @@ out/
 out*/
 .vs/
 .vscode/
+*.pkl
+*.out

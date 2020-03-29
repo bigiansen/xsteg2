@@ -10,13 +10,15 @@ WrapperObject.prototype.__class__ = WrapperObject;
 WrapperObject.__cache__ = {};
 Module['WrapperObject'] = WrapperObject;
 
-/** @suppress {duplicate} (TODO: avoid emitting this multiple times, it is redundant) */
+/** @suppress {duplicate} (TODO: avoid emitting this multiple times, it is redundant)
+    @param {*=} __class__ */
 function getCache(__class__) {
   return (__class__ || WrapperObject).__cache__;
 }
 Module['getCache'] = getCache;
 
-/** @suppress {duplicate} (TODO: avoid emitting this multiple times, it is redundant) */
+/** @suppress {duplicate} (TODO: avoid emitting this multiple times, it is redundant)
+    @param {*=} __class__ */
 function wrapPointer(ptr, __class__) {
   var cache = getCache(__class__);
   var ret = cache[ptr];
@@ -183,8 +185,35 @@ function ensureFloat64(value) {
 }
 
 
+// fixed_vector_u8
+/** @suppress {undefinedVars, duplicate} @this{Object} */function fixed_vector_u8(len) {
+  if (len && typeof len === 'object') len = len.ptr;
+  this.ptr = _emscripten_bind_fixed_vector_u8_fixed_vector_u8_1(len);
+  getCache(fixed_vector_u8)[this.ptr] = this;
+};;
+fixed_vector_u8.prototype = Object.create(WrapperObject.prototype);
+fixed_vector_u8.prototype.constructor = fixed_vector_u8;
+fixed_vector_u8.prototype.__class__ = fixed_vector_u8;
+fixed_vector_u8.__cache__ = {};
+Module['fixed_vector_u8'] = fixed_vector_u8;
+
+fixed_vector_u8.prototype['at'] = fixed_vector_u8.prototype.at = /** @suppress {undefinedVars, duplicate} @this{Object} */function(index) {
+  var self = this.ptr;
+  if (index && typeof index === 'object') index = index.ptr;
+  return _emscripten_bind_fixed_vector_u8_at_1(self, index);
+};;
+
+fixed_vector_u8.prototype['size'] = fixed_vector_u8.prototype.size = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_fixed_vector_u8_size_0(self);
+};;
+
+  fixed_vector_u8.prototype['__destroy__'] = fixed_vector_u8.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  _emscripten_bind_fixed_vector_u8___destroy___0(self);
+};
 // encoding_options
-/** @suppress {undefinedVars, duplicate} */function encoding_options(offset) {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function encoding_options(offset) {
   if (offset && typeof offset === 'object') offset = offset.ptr;
   this.ptr = _emscripten_bind_encoding_options_encoding_options_1(offset);
   getCache(encoding_options)[this.ptr] = this;
@@ -195,22 +224,22 @@ encoding_options.prototype.__class__ = encoding_options;
 encoding_options.__cache__ = {};
 Module['encoding_options'] = encoding_options;
 
-  encoding_options.prototype['get_first_pixel_offset'] = encoding_options.prototype.get_first_pixel_offset = /** @suppress {undefinedVars, duplicate} */function() {
+  encoding_options.prototype['get_first_pixel_offset'] = encoding_options.prototype.get_first_pixel_offset = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   return _emscripten_bind_encoding_options_get_first_pixel_offset_0(self);
 };
-    encoding_options.prototype['set_first_pixel_offset'] = encoding_options.prototype.set_first_pixel_offset = /** @suppress {undefinedVars, duplicate} */function(arg0) {
+    encoding_options.prototype['set_first_pixel_offset'] = encoding_options.prototype.set_first_pixel_offset = /** @suppress {undefinedVars, duplicate} @this{Object} */function(arg0) {
   var self = this.ptr;
   if (arg0 && typeof arg0 === 'object') arg0 = arg0.ptr;
   _emscripten_bind_encoding_options_set_first_pixel_offset_1(self, arg0);
 };
     Object.defineProperty(encoding_options.prototype, 'first_pixel_offset', { get: encoding_options.prototype.get_first_pixel_offset, set: encoding_options.prototype.set_first_pixel_offset });
-  encoding_options.prototype['__destroy__'] = encoding_options.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  encoding_options.prototype['__destroy__'] = encoding_options.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_encoding_options___destroy___0(self);
 };
 // image
-/** @suppress {undefinedVars, duplicate} */function image(data, w, h) {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function image(data, w, h) {
   ensureCache.prepare();
   if (typeof data == 'object') { data = ensureInt8(data); }
   if (w && typeof w === 'object') w = w.ptr;
@@ -224,17 +253,32 @@ image.prototype.__class__ = image;
 image.__cache__ = {};
 Module['image'] = image;
 
-image.prototype['pixel_count'] = image.prototype.pixel_count = /** @suppress {undefinedVars, duplicate} */function() {
+image.prototype['pixel_count'] = image.prototype.pixel_count = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   return _emscripten_bind_image_pixel_count_0(self);
 };;
 
-  image.prototype['__destroy__'] = image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+image.prototype['save_to_file_png'] = image.prototype.save_to_file_png = /** @suppress {undefinedVars, duplicate} @this{Object} */function(path, compression_level) {
+  var self = this.ptr;
+  ensureCache.prepare();
+  if (path && typeof path === 'object') path = path.ptr;
+  else path = ensureString(path);
+  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
+  _emscripten_bind_image_save_to_file_png_2(self, path, compression_level);
+};;
+
+image.prototype['save_to_memory_png'] = image.prototype.save_to_memory_png = /** @suppress {undefinedVars, duplicate} @this{Object} */function(compression_level) {
+  var self = this.ptr;
+  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
+  return wrapPointer(_emscripten_bind_image_save_to_memory_png_1(self, compression_level), fixed_vector_u8);
+};;
+
+  image.prototype['__destroy__'] = image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_image___destroy___0(self);
 };
 // pixel_availability
-/** @suppress {undefinedVars, duplicate} */function pixel_availability(r, g, b, a) {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function pixel_availability(r, g, b, a) {
   if (r && typeof r === 'object') r = r.ptr;
   if (g && typeof g === 'object') g = g.ptr;
   if (b && typeof b === 'object') b = b.ptr;
@@ -248,12 +292,12 @@ pixel_availability.prototype.__class__ = pixel_availability;
 pixel_availability.__cache__ = {};
 Module['pixel_availability'] = pixel_availability;
 
-  pixel_availability.prototype['__destroy__'] = pixel_availability.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  pixel_availability.prototype['__destroy__'] = pixel_availability.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_pixel_availability___destroy___0(self);
 };
 // ex_helper
-/** @suppress {undefinedVars, duplicate} */function ex_helper() {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function ex_helper() {
   this.ptr = _emscripten_bind_ex_helper_ex_helper_0();
   getCache(ex_helper)[this.ptr] = this;
 };;
@@ -263,18 +307,18 @@ ex_helper.prototype.__class__ = ex_helper;
 ex_helper.__cache__ = {};
 Module['ex_helper'] = ex_helper;
 
-ex_helper.prototype['get_exception_msg'] = ex_helper.prototype.get_exception_msg = /** @suppress {undefinedVars, duplicate} */function(exptr) {
+ex_helper.prototype['get_exception_msg'] = ex_helper.prototype.get_exception_msg = /** @suppress {undefinedVars, duplicate} @this{Object} */function(exptr) {
   var self = this.ptr;
   if (exptr && typeof exptr === 'object') exptr = exptr.ptr;
   return UTF8ToString(_emscripten_bind_ex_helper_get_exception_msg_1(self, exptr));
 };;
 
-  ex_helper.prototype['__destroy__'] = ex_helper.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  ex_helper.prototype['__destroy__'] = ex_helper.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_ex_helper___destroy___0(self);
 };
 // threshold
-/** @suppress {undefinedVars, duplicate} */function threshold(vdt, inv, val, pxav) {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function threshold(vdt, inv, val, pxav) {
   if (vdt && typeof vdt === 'object') vdt = vdt.ptr;
   if (inv && typeof inv === 'object') inv = inv.ptr;
   if (val && typeof val === 'object') val = val.ptr;
@@ -288,24 +332,24 @@ threshold.prototype.__class__ = threshold;
 threshold.__cache__ = {};
 Module['threshold'] = threshold;
 
-  threshold.prototype['__destroy__'] = threshold.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  threshold.prototype['__destroy__'] = threshold.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_threshold___destroy___0(self);
 };
 // VoidPtr
-/** @suppress {undefinedVars, duplicate} */function VoidPtr() { throw "cannot construct a VoidPtr, no constructor in IDL" }
+/** @suppress {undefinedVars, duplicate} @this{Object} */function VoidPtr() { throw "cannot construct a VoidPtr, no constructor in IDL" }
 VoidPtr.prototype = Object.create(WrapperObject.prototype);
 VoidPtr.prototype.constructor = VoidPtr;
 VoidPtr.prototype.__class__ = VoidPtr;
 VoidPtr.__cache__ = {};
 Module['VoidPtr'] = VoidPtr;
 
-  VoidPtr.prototype['__destroy__'] = VoidPtr.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  VoidPtr.prototype['__destroy__'] = VoidPtr.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_VoidPtr___destroy___0(self);
 };
 // steganographer
-/** @suppress {undefinedVars, duplicate} */function steganographer(img) {
+/** @suppress {undefinedVars, duplicate} @this{Object} */function steganographer(img) {
   if (img && typeof img === 'object') img = img.ptr;
   this.ptr = _emscripten_bind_steganographer_steganographer_1(img);
   getCache(steganographer)[this.ptr] = this;
@@ -316,25 +360,25 @@ steganographer.prototype.__class__ = steganographer;
 steganographer.__cache__ = {};
 Module['steganographer'] = steganographer;
 
-steganographer.prototype['add_threshold'] = steganographer.prototype.add_threshold = /** @suppress {undefinedVars, duplicate} */function(thres, apply) {
+steganographer.prototype['add_threshold'] = steganographer.prototype.add_threshold = /** @suppress {undefinedVars, duplicate} @this{Object} */function(thres, apply) {
   var self = this.ptr;
   if (thres && typeof thres === 'object') thres = thres.ptr;
   if (apply && typeof apply === 'object') apply = apply.ptr;
   _emscripten_bind_steganographer_add_threshold_2(self, thres, apply);
 };;
 
-steganographer.prototype['clear_thresholds'] = steganographer.prototype.clear_thresholds = /** @suppress {undefinedVars, duplicate} */function() {
+steganographer.prototype['clear_thresholds'] = steganographer.prototype.clear_thresholds = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_steganographer_clear_thresholds_0(self);
 };;
 
-steganographer.prototype['available_size_bytes'] = steganographer.prototype.available_size_bytes = /** @suppress {undefinedVars, duplicate} */function(eopts) {
+steganographer.prototype['available_size_bytes'] = steganographer.prototype.available_size_bytes = /** @suppress {undefinedVars, duplicate} @this{Object} */function(eopts) {
   var self = this.ptr;
   if (eopts && typeof eopts === 'object') eopts = eopts.ptr;
   return _emscripten_bind_steganographer_available_size_bytes_1(self, eopts);
 };;
 
-steganographer.prototype['encode'] = steganographer.prototype.encode = /** @suppress {undefinedVars, duplicate} */function(data, len, eopts) {
+steganographer.prototype['encode'] = steganographer.prototype.encode = /** @suppress {undefinedVars, duplicate} @this{Object} */function(data, len, eopts) {
   var self = this.ptr;
   ensureCache.prepare();
   if (typeof data == 'object') { data = ensureInt8(data); }
@@ -343,7 +387,7 @@ steganographer.prototype['encode'] = steganographer.prototype.encode = /** @supp
   return wrapPointer(_emscripten_bind_steganographer_encode_3(self, data, len, eopts), image);
 };;
 
-  steganographer.prototype['__destroy__'] = steganographer.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} */function() {
+  steganographer.prototype['__destroy__'] = steganographer.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_steganographer___destroy___0(self);
 };

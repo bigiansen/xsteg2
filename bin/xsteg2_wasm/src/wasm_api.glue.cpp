@@ -12,6 +12,24 @@ void array_bounds_check(const int array_size, const int array_idx) {
   }
 }
 
+// fixed_vector_u8
+
+fixed_vector_u8* EMSCRIPTEN_KEEPALIVE emscripten_bind_fixed_vector_u8_fixed_vector_u8_1(int len) {
+  return new fixed_vector_u8(len);
+}
+
+unsigned char EMSCRIPTEN_KEEPALIVE emscripten_bind_fixed_vector_u8_at_1(fixed_vector_u8* self, int index) {
+  return self->at(index);
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_fixed_vector_u8_size_0(fixed_vector_u8* self) {
+  return self->size();
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_fixed_vector_u8___destroy___0(fixed_vector_u8* self) {
+  delete self;
+}
+
 // encoding_options
 
 xsteg::encoding_options* EMSCRIPTEN_KEEPALIVE emscripten_bind_encoding_options_encoding_options_1(int offset) {
@@ -38,6 +56,15 @@ ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_image_3(unsigned char* da
 
 int EMSCRIPTEN_KEEPALIVE emscripten_bind_image_pixel_count_0(ien::image* self) {
   return self->pixel_count();
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_file_png_2(ien::image* self, char* path, int compression_level) {
+  self->save_to_file_png(path, compression_level);
+}
+
+fixed_vector_u8* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_memory_png_1(ien::image* self, int compression_level) {
+  static fixed_vector_u8 temp;
+  return (temp = self->save_to_memory_png(compression_level), &temp);
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_image___destroy___0(ien::image* self) {
@@ -86,28 +113,27 @@ void EMSCRIPTEN_KEEPALIVE emscripten_bind_VoidPtr___destroy___0(void** self) {
 
 // steganographer
 
-xsteg::steganographer* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_steganographer_1(ien::image* img) {
-  return new xsteg::steganographer(*img);
+steganographer* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_steganographer_1(const ien::image* img) {
+  return new steganographer(*img);
 }
 
-void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_add_threshold_2(xsteg::steganographer* self, xsteg::threshold* thres, bool apply) {
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_add_threshold_2(steganographer* self, xsteg::threshold* thres, bool apply) {
   self->add_threshold(*thres, apply);
 }
 
-void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_clear_thresholds_0(xsteg::steganographer* self) {
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_clear_thresholds_0(steganographer* self) {
   self->clear_thresholds();
 }
 
-int EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_available_size_bytes_1(xsteg::steganographer* self, xsteg::encoding_options* eopts) {
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_available_size_bytes_1(steganographer* self, xsteg::encoding_options* eopts) {
   return self->available_size_bytes(*eopts);
 }
 
-ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_encode_3(xsteg::steganographer* self, unsigned char* data, int len, xsteg::encoding_options* eopts) {
-  static ien::image temp;
-  return (temp = self->encode(data, len, *eopts), &temp);
+ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_encode_3(steganographer* self, unsigned char* data, int len, xsteg::encoding_options* eopts) {
+  return self->encode(data, len, *eopts);
 }
 
-void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer___destroy___0(xsteg::steganographer* self) {
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer___destroy___0(steganographer* self) {
   delete self;
 }
 

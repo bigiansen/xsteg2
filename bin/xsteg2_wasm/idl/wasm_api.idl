@@ -11,6 +11,14 @@ interface encoding_options
     attribute long first_pixel_offset;
 };
 
+interface fixed_vector_u8
+{
+    void fixed_vector_u8(long len);
+    octet at(long index);
+
+    long size();
+};
+
 enum visual_data_type
 {
     "visual_data_type::CHANNEL_RED",
@@ -35,11 +43,14 @@ interface image
 {
     void image(octet[] data, long w, long h);
     long pixel_count();
+
+    void save_to_file_png(DOMString path, long compression_level);
+    [Value] fixed_vector_u8 save_to_memory_png(long compression_level);
 };
 
 interface steganographer
 {
-    void steganographer([Ref] image img);
+    void steganographer([Const, Ref] image img);
 
     void add_threshold([Ref] threshold thres, boolean apply);
     void clear_thresholds();

@@ -100,9 +100,9 @@ void parse_threshold(arg_iterator& argit, main_args& margs)
             throw std::invalid_argument(std::string("Invalid threshold visual data argument: ") + std::string(sv_vdt));
         }
 
-        if(sv_inv == "i" || sv_inv == "n")
+        if(sv_inv == "i" || sv_inv == "n" || sv_inv == "0" || sv_inv == "1")
         {
-            inverted = (sv_inv == "i");
+            inverted = (sv_inv == "i" || sv_inv == "1");
         }
         else
         {

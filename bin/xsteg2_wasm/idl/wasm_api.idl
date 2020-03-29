@@ -37,7 +37,6 @@ interface image
     long pixel_count();
 };
 
-[Prefix="xsteg::"]
 interface steganographer
 {
     void steganographer([Ref] image img);
@@ -47,7 +46,7 @@ interface steganographer
 
     long available_size_bytes([Ref] encoding_options eopts);
 
-    [Value] image encode(octet[] data, long len, [Ref] encoding_options eopts);
+    image encode(octet[] data, long len, [Ref] encoding_options eopts);
 };
 
 interface ex_helper

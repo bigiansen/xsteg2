@@ -141,29 +141,29 @@ namespace xsteg
         std::string_view bits, 
         std::string_view val)
     {
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             std::all_of(type.begin(), type.end(), [](char ch) {
                 return std::isdigit(ch);
             }),
             "Invalid type parameter (invalid character(s))"
         );
 
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             invt.size() == 1, 
             "Invalid inversion parameter (invalid size)"
         );
 
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             invt[0] == TH_NON_INVERTED || invt[0] == TH_INVERTED,
             "Invalid inversion parameter (invalid character(s))"
         );
 
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             bits.size() == 4, 
             "Invalid channel bit availability parameter format (invalid size)"
         );
 
-        ien::runtime_assert(std::all_of(bits.begin(), bits.end(), [](char ch) {
+        LIEN_ASSERT_MSG(std::all_of(bits.begin(), bits.end(), [](char ch) {
                 return std::count(TH_BITS_ALLOWED_CHARS.begin(), TH_BITS_ALLOWED_CHARS.end(), ch) == 1;
             }),
             "Invalid channel bit availability parameter format (invalid character(s))"

@@ -7,9 +7,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(cmake/xsteg2.cmake)
 
-option(XSTEG2_BUILD_CLI_EXECUTABLE "Build CLI executable" Off)
+option(XSTEG2_BUILD_CLI_EXECUTABLE "Build CLI executable" On)
 option(XSTEG2_BUILD_WASM_LIBRARY "Build WASM/JS library" Off)
-option(XSTEG2_BUILD_TESTS "Build tests" Off)
+option(XSTEG2_BUILD_TESTS "Build tests" On)
 
 XSTEG2_SET_SHARED_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/shared)
 XSTEG2_SET_STATIC_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/static)

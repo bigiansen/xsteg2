@@ -21,7 +21,7 @@ namespace xsteg
         uint8_t bits_a : 3;
         bool ignore_a  : 1;
 
-        LIEN_RELEASE_CONSTEXPR pixel_availability(int8_t r, int8_t g, int8_t b, int8_t a)
+        LIEN_RELEASE_ONLY(constexpr) pixel_availability(int8_t r, int8_t g, int8_t b, int8_t a)
             : bits_r(static_cast<uint8_t>(r < 0 ? 0 : r))
             , ignore_r(r < 0)
             , bits_g(static_cast<uint8_t>(g < 0 ? 0 : g))
@@ -31,10 +31,10 @@ namespace xsteg
             , bits_a(static_cast<uint8_t>(a < 0 ? 0 : a))
             , ignore_a(a < 0)
         {
-            ien::debug_assert(r < 8, "Max availability is 7 bits per channel!");
-            ien::debug_assert(g < 8, "Max availability is 7 bits per channel!");
-            ien::debug_assert(b < 8, "Max availability is 7 bits per channel!");
-            ien::debug_assert(a < 8, "Max availability is 7 bits per channel!");
+            LIEN_DEBUG_ASSERT_MSG(r < 8, "Max availability is 7 bits per channel!");
+            LIEN_DEBUG_ASSERT_MSG(g < 8, "Max availability is 7 bits per channel!");
+            LIEN_DEBUG_ASSERT_MSG(b < 8, "Max availability is 7 bits per channel!");
+            LIEN_DEBUG_ASSERT_MSG(a < 8, "Max availability is 7 bits per channel!");
         }
 
         void merge(const pixel_availability& src);

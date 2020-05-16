@@ -133,15 +133,15 @@ namespace xsteg
 
     ien::image steganographer::encode(const uint8_t* data, size_t len, const encoding_options& opts) const
     {
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             len > 0,
             "Attempt to encode 0-length data!"
         );
 
-        ien::runtime_assert(
+        LIEN_ASSERT_MSG(
             len <= available_size_bytes(opts),
-            "Not enough space available to encode data!  Requested: " +
-                std::to_string(len) + " Available: " + std::to_string(available_size_bytes())
+            ("Not enough space available to encode data!  Requested: " +
+                std::to_string(len) + " Available: " + std::to_string(available_size_bytes())).c_str()
         );
 
         ien::image result = img();
@@ -175,7 +175,7 @@ namespace xsteg
         size_t processed_bits = 0;
         auto next_bits_mask = [&](uint8_t amount) -> uint8_t
         {
-            ien::debug_assert(amount <= 8, "Requested too many bits!");
+            LIEN_DEBUG_ASSERT_MSG(amount <= 8, "Requested too many bits!");
             uint8_t result = 0;
             for(size_t i = 0; i < amount; ++i)
             {
@@ -214,7 +214,7 @@ namespace xsteg
 
     ien::fixed_vector<uint8_t> steganographer::decode(const encoding_options& opts) const
     {
-		ien::runtime_assert(
+		LIEN_ASSERT_MSG(
 			available_size_bytes(opts) > XSTEG_STEGANOGRAPHER_HEADER_SIZE,
 			"Specified thresholds cannot hold any data!"
 		);

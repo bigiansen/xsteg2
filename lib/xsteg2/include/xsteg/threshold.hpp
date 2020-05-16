@@ -18,7 +18,7 @@ namespace xsteg
         float value;
         pixel_availability availability;
 
-        LIEN_RELEASE_CONSTEXPR threshold(visual_data_type vdtype, bool inv, float val, pixel_availability pxav)
+        LIEN_RELEASE_ONLY(constexpr) threshold(visual_data_type vdtype, bool inv, float val, pixel_availability pxav)
             : type(vdtype)
             , inverted(inv)
             , value(val)

@@ -2,6 +2,14 @@
 interface pixel_availability
 {
     void pixel_availability(long r, long g, long b, long a);
+    attribute long bits_r;
+    attribute long bits_g;
+    attribute long bits_b;
+    attribute long bits_a;
+    attribute boolean ignore_r;
+    attribute boolean ignore_g;
+    attribute boolean ignore_b;
+    attribute boolean ignore_a;
 };
 
 [Prefix="xsteg::"]
@@ -35,7 +43,11 @@ enum visual_data_type
 [Prefix="xsteg::"]
 interface threshold
 {
-    void threshold(visual_data_type vdt, boolean inv, float val, [Ref] pixel_availability pxav);
+    void threshold(long vdt, boolean inv, float val, [Ref] pixel_availability pxav);
+    attribute long type;
+    attribute boolean inverted;
+    attribute float value;
+    attribute pixel_availability availability;
 };
 
 [Prefix="ien::"]
@@ -58,6 +70,13 @@ interface steganographer
     long available_size_bytes([Ref] encoding_options eopts);
 
     image encode(octet[] data, long len, [Ref] encoding_options eopts);
+};
+
+interface threshold_stdvector
+{
+    void threshold_stdvector();
+    long size();
+    [Ref] threshold at(long idx);
 };
 
 interface ex_helper

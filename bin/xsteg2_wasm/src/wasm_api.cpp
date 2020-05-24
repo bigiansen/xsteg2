@@ -39,4 +39,6 @@ public:
 
 typedef ien::fixed_vector<uint8_t> fixed_vector_u8;
 
+typedef std::vector<xsteg::threshold> threshold_stdvector;
+
 #include "wasm_api.glue.cpp"

@@ -1,6 +1,6 @@
 macro(EMS_LOPT str)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ${str}")
-	target_link_options(xsteg2_wasm PRIVATE "-s ${str}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s${str}")
+	target_link_options(xsteg2_wasm PRIVATE "-s${str}")
 endmacro()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --post-js ${CMAKE_CURRENT_SOURCE_DIR}/src/wasm_api.glue.js")
@@ -9,12 +9,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --post-js ${CMAKE_CURRENT_SOURCE_DIR}/sr
 if(NOT EXISTS $ENV{EMSDK})
     message(FATAL "Unable to find emsdk path")
 else()
+    message("Cleaning previous WebIDL Glue Code...")
+    file(REMOVE src/wasm_api.glue.cpp)
+    file(REMOVE src/wasm_api.glue.js)
+    message("Result: ${WASM_GLUE_CLEAN_OK}")
     message("Building WebIDL Glue Code...")
     execute_process(
-        COMMAND python $ENV{EMSDK}/upstream/emscripten/tools/webidl_binder.py idl/wasm_api.idl src/wasm_api.glue
+        COMMAND python3 $ENV{EMSDK}/upstream/emscripten/tools/webidl_binder.py idl/wasm_api.idl src/wasm_api.glue
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         RESULT_VARIABLE WASM_GLUE_OK
     )
+    message("Result: ${WASM_GLUE_OK}")
 endif()
 
 add_custom_target(xsteg2_wasm_glue DEPENDS src/wasm_api.glue.cpp)

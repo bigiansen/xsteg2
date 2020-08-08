@@ -43,11 +43,11 @@ enum visual_data_type
 [Prefix="xsteg::"]
 interface threshold
 {
-    void threshold(long vdt, boolean inv, float val, [Ref] pixel_availability pxav);
-    attribute long type;
+    void threshold(visual_data_type vdt, boolean inv, float val, [Ref] pixel_availability pxav);
+    attribute visual_data_type type;
     attribute boolean inverted;
     attribute float value;
-    attribute pixel_availability availability;
+    [Value] attribute pixel_availability availability;
 };
 
 [Prefix="ien::"]

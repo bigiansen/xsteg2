@@ -133,15 +133,15 @@ void EMSCRIPTEN_KEEPALIVE emscripten_bind_fixed_vector_u8___destroy___0(fixed_ve
 
 // threshold
 
-xsteg::threshold* EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_threshold_4(int vdt, bool inv, float val, xsteg::pixel_availability* pxav) {
+xsteg::threshold* EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_threshold_4(visual_data_type vdt, bool inv, float val, xsteg::pixel_availability* pxav) {
   return new xsteg::threshold(vdt, inv, val, *pxav);
 }
 
-int EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_get_type_0(xsteg::threshold* self) {
+visual_data_type EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_get_type_0(xsteg::threshold* self) {
   return self->type;
 }
 
-void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_set_type_1(xsteg::threshold* self, int arg0) {
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_set_type_1(xsteg::threshold* self, visual_data_type arg0) {
   self->type = arg0;
 }
 
@@ -162,11 +162,11 @@ void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_set_value_1(xsteg::threshold
 }
 
 xsteg::pixel_availability* EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_get_availability_0(xsteg::threshold* self) {
-  return self->availability;
+  return &self->availability;
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_set_availability_1(xsteg::threshold* self, xsteg::pixel_availability* arg0) {
-  self->availability = arg0;
+  self->availability = *arg0;
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold___destroy___0(xsteg::threshold* self) {

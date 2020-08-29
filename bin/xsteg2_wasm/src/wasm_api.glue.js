@@ -414,6 +414,8 @@ Module['threshold'] = threshold;
   if (typeof data == 'object') { data = ensureInt8(data); }
   if (w && typeof w === 'object') w = w.ptr;
   if (h && typeof h === 'object') h = h.ptr;
+  if (w === undefined) { this.ptr = _emscripten_bind_image_image_1(data); getCache(image)[this.ptr] = this;return }
+  if (h === undefined) { this.ptr = _emscripten_bind_image_image_2(data, w); getCache(image)[this.ptr] = this;return }
   this.ptr = _emscripten_bind_image_image_3(data, w, h);
   getCache(image)[this.ptr] = this;
 };;
@@ -442,8 +444,10 @@ image.prototype['save_to_file_png'] = image.prototype.save_to_file_png = /** @su
   _emscripten_bind_image___destroy___0(self);
 };
 // packed_image
-/** @suppress {undefinedVars, duplicate} @this{Object} */function packed_image() {
-  this.ptr = _emscripten_bind_packed_image_packed_image_0();
+/** @suppress {undefinedVars, duplicate} @this{Object} */function packed_image(img) {
+  if (img && typeof img === 'object') img = img.ptr;
+  if (img === undefined) { this.ptr = _emscripten_bind_packed_image_packed_image_0(); getCache(packed_image)[this.ptr] = this;return }
+  this.ptr = _emscripten_bind_packed_image_packed_image_1(img);
   getCache(packed_image)[this.ptr] = this;
 };;
 packed_image.prototype = Object.create(WrapperObject.prototype);

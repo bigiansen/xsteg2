@@ -68,6 +68,7 @@ interface packed_image
     void save_to_file_png(DOMString path, long compression_level);
 };
 
+[Prefix="xsteg::"]
 interface steganographer
 {
     void steganographer([Const, Ref] image img);

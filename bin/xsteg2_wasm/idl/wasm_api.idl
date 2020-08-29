@@ -54,6 +54,8 @@ interface image
 {
     void image(octet[] data, long w, long h);
     void image([Const, Ref] image img);
+    long width();
+    long height();
     long pixel_count();
     void save_to_file_png(DOMString path, long compression_level);
 };
@@ -63,6 +65,8 @@ interface packed_image
 {
     void packed_image();
     void packed_image([Const, Ref] packed_image img);
+    long width();
+    long height();
     long pixel_count();
     [Value] image to_image();
     void save_to_file_png(DOMString path, long compression_level);

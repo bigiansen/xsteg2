@@ -425,6 +425,16 @@ image.prototype.__class__ = image;
 image.__cache__ = {};
 Module['image'] = image;
 
+image.prototype['width'] = image.prototype.width = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_image_width_0(self);
+};;
+
+image.prototype['height'] = image.prototype.height = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_image_height_0(self);
+};;
+
 image.prototype['pixel_count'] = image.prototype.pixel_count = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   return _emscripten_bind_image_pixel_count_0(self);
@@ -455,6 +465,16 @@ packed_image.prototype.constructor = packed_image;
 packed_image.prototype.__class__ = packed_image;
 packed_image.__cache__ = {};
 Module['packed_image'] = packed_image;
+
+packed_image.prototype['width'] = packed_image.prototype.width = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_packed_image_width_0(self);
+};;
+
+packed_image.prototype['height'] = packed_image.prototype.height = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_packed_image_height_0(self);
+};;
 
 packed_image.prototype['pixel_count'] = packed_image.prototype.pixel_count = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;

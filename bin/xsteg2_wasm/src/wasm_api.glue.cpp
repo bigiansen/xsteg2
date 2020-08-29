@@ -183,6 +183,14 @@ ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_image_3(unsigned char* da
   return new ien::image(data, w, h);
 }
 
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_image_width_0(ien::image* self) {
+  return self->width();
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_image_height_0(ien::image* self) {
+  return self->height();
+}
+
 int EMSCRIPTEN_KEEPALIVE emscripten_bind_image_pixel_count_0(ien::image* self) {
   return self->pixel_count();
 }
@@ -203,6 +211,14 @@ ien::packed_image* EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_packed_imag
 
 ien::packed_image* EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_packed_image_1(const ien::packed_image* img) {
   return new ien::packed_image(*img);
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_width_0(ien::packed_image* self) {
+  return self->width();
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_height_0(ien::packed_image* self) {
+  return self->height();
 }
 
 int EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_pixel_count_0(ien::packed_image* self) {

@@ -58,6 +58,8 @@ interface image
     long height();
     long pixel_count();
     void save_to_file_png(DOMString path, long compression_level);
+    [Value] fixed_vector_u8 save_to_memory_png(long compression_level);
+    DOMString to_png_base64(long compression_level);
 };
 
 [Prefix="ien::"]

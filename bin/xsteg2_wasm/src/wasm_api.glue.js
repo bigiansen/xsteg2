@@ -449,6 +449,18 @@ image.prototype['save_to_file_png'] = image.prototype.save_to_file_png = /** @su
   _emscripten_bind_image_save_to_file_png_2(self, path, compression_level);
 };;
 
+image.prototype['save_to_memory_png'] = image.prototype.save_to_memory_png = /** @suppress {undefinedVars, duplicate} @this{Object} */function(compression_level) {
+  var self = this.ptr;
+  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
+  return wrapPointer(_emscripten_bind_image_save_to_memory_png_1(self, compression_level), fixed_vector_u8);
+};;
+
+image.prototype['to_png_base64'] = image.prototype.to_png_base64 = /** @suppress {undefinedVars, duplicate} @this{Object} */function(compression_level) {
+  var self = this.ptr;
+  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
+  return UTF8ToString(_emscripten_bind_image_to_png_base64_1(self, compression_level));
+};;
+
   image.prototype['__destroy__'] = image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_image___destroy___0(self);

@@ -199,6 +199,15 @@ void EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_file_png_2(ien::image* s
   self->save_to_file_png(path, compression_level);
 }
 
+fixed_vector_u8* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_memory_png_1(ien::image* self, int compression_level) {
+  static fixed_vector_u8 temp;
+  return (temp = self->save_to_memory_png(compression_level), &temp);
+}
+
+char* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_to_png_base64_1(ien::image* self, int compression_level) {
+  return self->to_png_base64(compression_level);
+}
+
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_image___destroy___0(ien::image* self) {
   delete self;
 }

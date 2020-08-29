@@ -23,7 +23,6 @@ interface fixed_vector_u8
 {
     void fixed_vector_u8(long len);
     octet at(long index);
-
     long size();
 };
 
@@ -54,22 +53,29 @@ interface threshold
 interface image
 {
     void image(octet[] data, long w, long h);
+    void image([Const, Ref] image img);
     long pixel_count();
-
     void save_to_file_png(DOMString path, long compression_level);
-    [Value] fixed_vector_u8 save_to_memory_png(long compression_level);
+};
+
+[Prefix="ien::"]
+interface packed_image
+{
+    void packed_image();
+    void packed_image([Const, Ref] packed_image img);
+    long pixel_count();
+    [Value] image to_image();
+    void save_to_file_png(DOMString path, long compression_level);
 };
 
 interface steganographer
 {
     void steganographer([Const, Ref] image img);
-
     void add_threshold([Ref] threshold thres, boolean apply);
     void clear_thresholds();
-
     long available_size_bytes([Ref] encoding_options eopts);
-
-    image encode(octet[] data, long len, [Ref] encoding_options eopts);
+    [Value] image encode(octet[] data, long len, [Ref] encoding_options eopts);
+    [Value] packed_image gen_availability_map_image([Const, Ref] threshold_stdvector thresholds);
 };
 
 interface threshold_stdvector
@@ -77,6 +83,7 @@ interface threshold_stdvector
     void threshold_stdvector();
     long size();
     [Ref] threshold at(long idx);
+    void push_back([Const, Ref] threshold th);
 };
 
 interface ex_helper

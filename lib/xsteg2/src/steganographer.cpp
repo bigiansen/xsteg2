@@ -63,8 +63,14 @@ namespace xsteg
 
     void steganographer::clear_thresholds()
     {
+        clear_availability();
         _thresholds.clear();
         _last_processed_thres_idx = -1;
+    }
+
+    void steganographer::clear_availability()
+    {
+        std::fill(_av_map.begin(), _av_map.end(), xsteg::pixel_availability(-1, -1, -1, -1));
     }
 
     bool steganographer::apply_next_threshold()
@@ -399,6 +405,26 @@ namespace xsteg
             uint8_t grayscale_val = inverted ? 255 - vdata[i] : vdata[i];
             uint8_t pixel[4] = { grayscale_val, grayscale_val, grayscale_val, 255 };
             std::memcpy(result.data() + (i * 4), pixel, 4);
+        }
+        return result;
+    }
+
+    ien::packed_image steganographer::gen_availability_map_image(const std::vector<threshold>& thresholds)
+    {
+        ien::packed_image result(img().width(), img().height());
+        std::memset(result.data(), 0xFFu, result.pixel_count() * 4);
+
+        for(auto& th : thresholds)
+        {
+            auto img = gen_visual_data_image(th.type, th.inverted);
+            for(size_t i = 0; i < img.pixel_count() * 4; i += 4)
+            {
+                uint8_t* ptr = img.data() + i;
+                uint8_t val = *ptr;
+                float fval = static_cast<float>(val) / 255.0F;
+                uint32_t repl_val = (fval >= th.value) ? 0xFFFFFF00 : 0x00000000;
+                *reinterpret_cast<uint32_t*>(result.data() + i) &= repl_val;
+            }
         }
         return result;
     }

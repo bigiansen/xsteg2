@@ -49,12 +49,15 @@ namespace xsteg
         bool apply_next_threshold();
         void apply_thresholds();
 
+        void clear_availability();
+
         size_t available_size_bytes(const encoding_options& = encoding_options()) const;
 
         ien::image encode(const uint8_t* data, size_t len, const encoding_options& opts) const;
         ien::fixed_vector<uint8_t> decode(const encoding_options& opts) const;
 
         ien::packed_image gen_visual_data_image(visual_data_type type, bool inverted);
+        ien::packed_image gen_availability_map_image(const std::vector<threshold>& thresholds);
 
         const ien::image& img() const;
     };

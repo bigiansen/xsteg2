@@ -187,12 +187,30 @@ void EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_file_png_2(ien::image* s
   self->save_to_file_png(path, compression_level);
 }
 
-fixed_vector_u8* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_memory_png_1(ien::image* self, int compression_level) {
-  static fixed_vector_u8 temp;
-  return (temp = self->save_to_memory_png(compression_level), &temp);
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_image___destroy___0(ien::image* self) {
+  delete self;
 }
 
-void EMSCRIPTEN_KEEPALIVE emscripten_bind_image___destroy___0(ien::image* self) {
+// packed_image
+
+ien::packed_image* EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_packed_image_0() {
+  return new ien::packed_image();
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_pixel_count_0(ien::packed_image* self) {
+  return self->pixel_count();
+}
+
+ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_to_image_0(ien::packed_image* self) {
+  static ien::image temp;
+  return (temp = self->to_image(), &temp);
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image_save_to_file_png_2(ien::packed_image* self, char* path, int compression_level) {
+  self->save_to_file_png(path, compression_level);
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_packed_image___destroy___0(ien::packed_image* self) {
   delete self;
 }
 
@@ -218,6 +236,11 @@ ien::image* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_encode_3(stegano
   return self->encode(data, len, *eopts);
 }
 
+ien::packed_image* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_gen_availability_map_image_1(steganographer* self, const threshold_stdvector* thresholds) {
+  static ien::packed_image temp;
+  return (temp = self->gen_availability_map_image(*thresholds), &temp);
+}
+
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer___destroy___0(steganographer* self) {
   delete self;
 }
@@ -234,6 +257,10 @@ int EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_stdvector_size_0(threshold_st
 
 xsteg::threshold* EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_stdvector_at_1(threshold_stdvector* self, int idx) {
   return &self->at(idx);
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_stdvector_push_back_1(threshold_stdvector* self, const xsteg::threshold* th) {
+  self->push_back(*th);
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_threshold_stdvector___destroy___0(threshold_stdvector* self) {

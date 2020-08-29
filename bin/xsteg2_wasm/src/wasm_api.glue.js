@@ -437,15 +437,43 @@ image.prototype['save_to_file_png'] = image.prototype.save_to_file_png = /** @su
   _emscripten_bind_image_save_to_file_png_2(self, path, compression_level);
 };;
 
-image.prototype['save_to_memory_png'] = image.prototype.save_to_memory_png = /** @suppress {undefinedVars, duplicate} @this{Object} */function(compression_level) {
-  var self = this.ptr;
-  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
-  return wrapPointer(_emscripten_bind_image_save_to_memory_png_1(self, compression_level), fixed_vector_u8);
-};;
-
   image.prototype['__destroy__'] = image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_image___destroy___0(self);
+};
+// packed_image
+/** @suppress {undefinedVars, duplicate} @this{Object} */function packed_image() {
+  this.ptr = _emscripten_bind_packed_image_packed_image_0();
+  getCache(packed_image)[this.ptr] = this;
+};;
+packed_image.prototype = Object.create(WrapperObject.prototype);
+packed_image.prototype.constructor = packed_image;
+packed_image.prototype.__class__ = packed_image;
+packed_image.__cache__ = {};
+Module['packed_image'] = packed_image;
+
+packed_image.prototype['pixel_count'] = packed_image.prototype.pixel_count = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_packed_image_pixel_count_0(self);
+};;
+
+packed_image.prototype['to_image'] = packed_image.prototype.to_image = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return wrapPointer(_emscripten_bind_packed_image_to_image_0(self), image);
+};;
+
+packed_image.prototype['save_to_file_png'] = packed_image.prototype.save_to_file_png = /** @suppress {undefinedVars, duplicate} @this{Object} */function(path, compression_level) {
+  var self = this.ptr;
+  ensureCache.prepare();
+  if (path && typeof path === 'object') path = path.ptr;
+  else path = ensureString(path);
+  if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
+  _emscripten_bind_packed_image_save_to_file_png_2(self, path, compression_level);
+};;
+
+  packed_image.prototype['__destroy__'] = packed_image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  _emscripten_bind_packed_image___destroy___0(self);
 };
 // steganographer
 /** @suppress {undefinedVars, duplicate} @this{Object} */function steganographer(img) {
@@ -486,6 +514,12 @@ steganographer.prototype['encode'] = steganographer.prototype.encode = /** @supp
   return wrapPointer(_emscripten_bind_steganographer_encode_3(self, data, len, eopts), image);
 };;
 
+steganographer.prototype['gen_availability_map_image'] = steganographer.prototype.gen_availability_map_image = /** @suppress {undefinedVars, duplicate} @this{Object} */function(thresholds) {
+  var self = this.ptr;
+  if (thresholds && typeof thresholds === 'object') thresholds = thresholds.ptr;
+  return wrapPointer(_emscripten_bind_steganographer_gen_availability_map_image_1(self, thresholds), packed_image);
+};;
+
   steganographer.prototype['__destroy__'] = steganographer.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_steganographer___destroy___0(self);
@@ -510,6 +544,12 @@ threshold_stdvector.prototype['at'] = threshold_stdvector.prototype.at = /** @su
   var self = this.ptr;
   if (idx && typeof idx === 'object') idx = idx.ptr;
   return wrapPointer(_emscripten_bind_threshold_stdvector_at_1(self, idx), threshold);
+};;
+
+threshold_stdvector.prototype['push_back'] = threshold_stdvector.prototype.push_back = /** @suppress {undefinedVars, duplicate} @this{Object} */function(th) {
+  var self = this.ptr;
+  if (th && typeof th === 'object') th = th.ptr;
+  _emscripten_bind_threshold_stdvector_push_back_1(self, th);
 };;
 
   threshold_stdvector.prototype['__destroy__'] = threshold_stdvector.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {

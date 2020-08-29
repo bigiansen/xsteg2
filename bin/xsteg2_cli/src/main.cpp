@@ -21,12 +21,13 @@ using namespace std::literals::string_view_literals;
 
 enum class main_mode
 {
-    UNSPECIFIED         = 0,
-    ENCODE              = 1,
-    DECODE              = 2,
-    EXPORT_KEY_FILE     = 3,
-    EXPORT_KEY_STRING   = 4,
-    VISUAL_DATA_IMAGE   = 5,
+    UNSPECIFIED             = 0,
+    ENCODE                  = 1,
+    DECODE                  = 2,
+    EXPORT_KEY_FILE         = 3,
+    EXPORT_KEY_STRING       = 4,
+    VISUAL_DATA_IMAGE       = 5,
+    AVAILABILITY_MAP_IMAGE  = 6
 };
 
 struct main_args
@@ -229,6 +230,10 @@ main_args parse_args(arg_iterator& argit)
             margs.mode = main_mode::VISUAL_DATA_IMAGE;
             parse_single_arg(argit, margs.visual_data_type, "vd(generate Visual Data image)");
         }
+        else if(l_arg == "-am" || l_arg == "--gen-availability-map-image")
+        {
+            margs.mode = main_mode::AVAILABILITY_MAP_IMAGE;
+        }
         else
         {
             throw std::invalid_argument("Invalid argument: " + l_arg);
@@ -381,6 +386,22 @@ void gen_vdata_image(main_args& args)
     result.save_to_file_png(*args.output_image_file);
 }
 
+void gen_avmap_image(main_args& args)
+{
+    if(!args.input_image_file || !args.input_image_file.value().size())
+        throw std::invalid_argument("Empty input image path!");
+
+    if(!args.output_image_file || !args.output_image_file.value().size())
+        throw std::invalid_argument("Empty output image path!");
+
+    if(args.thresholds.size() == 0)
+        throw std::invalid_argument("No thresholds specified!");
+
+    xsteg::steganographer steg(*args.input_image_file);
+    auto result = steg.gen_availability_map_image(args.thresholds);
+    result.save_to_file_png(*args.output_image_file);
+}
+
 void run_xsteg(main_args& args)
 {
     switch(args.mode)
@@ -403,6 +424,10 @@ void run_xsteg(main_args& args)
 
         case main_mode::VISUAL_DATA_IMAGE:
             gen_vdata_image(args);
+            break;
+
+        case main_mode::AVAILABILITY_MAP_IMAGE:
+            gen_avmap_image(args);
             break;
 
         default:

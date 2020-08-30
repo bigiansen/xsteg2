@@ -413,17 +413,18 @@ namespace xsteg
     {
         ien::packed_image result(img().width(), img().height());
         std::memset(result.data(), 0xFFu, result.pixel_count() * 4);
+        uint32_t* result_ptr = reinterpret_cast<uint32_t*>(result.data());
 
         for(auto& th : thresholds)
         {
             auto img = gen_visual_data_image(th.type, th.inverted);
-            for(size_t i = 0; i < img.pixel_count() * 4; i += 4)
+            uint32_t* data_ptr = reinterpret_cast<uint32_t*>(img.data());
+            uint8_t thval = static_cast<uint8_t>(std::min(th.value * 255.0F, 255.0F));
+            for(size_t i = 0; i < img.pixel_count(); ++i)
             {
-                uint8_t* ptr = img.data() + i;
-                uint8_t val = *ptr;
-                float fval = static_cast<float>(val) / 255.0F;
-                uint32_t repl_val = (fval >= th.value) ? 0xFFFFFF00 : 0x00000000;
-                *reinterpret_cast<uint32_t*>(result.data() + i) &= repl_val;
+                uint8_t pxval = static_cast<uint8_t>(data_ptr[i] >> 24);
+                uint32_t repl_val = (pxval >= thval) ? 0xFFFFFFFFu : 0x000000FFu;
+                result_ptr[i] &= repl_val;
             }
         }
         return result;

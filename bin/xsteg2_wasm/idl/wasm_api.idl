@@ -59,7 +59,7 @@ interface image
     long pixel_count();
     void save_to_file_png(DOMString path, long compression_level);
     [Value] fixed_vector_u8 save_to_memory_png(long compression_level);
-    DOMString to_png_base64(long compression_level);
+    [Value] string to_png_base64(long compression_level);
 };
 
 [Prefix="ien::"]
@@ -83,6 +83,15 @@ interface steganographer
     long available_size_bytes([Ref] encoding_options eopts);
     [Value] image encode(octet[] data, long len, [Ref] encoding_options eopts);
     [Value] packed_image gen_availability_map_image([Const, Ref] threshold_stdvector thresholds);
+};
+
+[Prefix="std::"]
+interface string
+{
+    void string();
+    long size();
+    byte at(long idx);
+    DOMString data();
 };
 
 interface threshold_stdvector

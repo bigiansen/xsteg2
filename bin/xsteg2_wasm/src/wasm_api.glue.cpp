@@ -204,8 +204,9 @@ fixed_vector_u8* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_save_to_memory_png_1
   return (temp = self->save_to_memory_png(compression_level), &temp);
 }
 
-char* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_to_png_base64_1(ien::image* self, int compression_level) {
-  return self->to_png_base64(compression_level);
+std::string* EMSCRIPTEN_KEEPALIVE emscripten_bind_image_to_png_base64_1(ien::image* self, int compression_level) {
+  static std::string temp;
+  return (temp = self->to_png_base64(compression_level), &temp);
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_image___destroy___0(ien::image* self) {
@@ -276,6 +277,28 @@ ien::packed_image* EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer_gen_avail
 }
 
 void EMSCRIPTEN_KEEPALIVE emscripten_bind_steganographer___destroy___0(xsteg::steganographer* self) {
+  delete self;
+}
+
+// string
+
+std::string* EMSCRIPTEN_KEEPALIVE emscripten_bind_string_string_0() {
+  return new std::string();
+}
+
+int EMSCRIPTEN_KEEPALIVE emscripten_bind_string_size_0(std::string* self) {
+  return self->size();
+}
+
+char EMSCRIPTEN_KEEPALIVE emscripten_bind_string_at_1(std::string* self, int idx) {
+  return self->at(idx);
+}
+
+char* EMSCRIPTEN_KEEPALIVE emscripten_bind_string_data_0(std::string* self) {
+  return self->data();
+}
+
+void EMSCRIPTEN_KEEPALIVE emscripten_bind_string___destroy___0(std::string* self) {
   delete self;
 }
 

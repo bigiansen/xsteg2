@@ -458,7 +458,7 @@ image.prototype['save_to_memory_png'] = image.prototype.save_to_memory_png = /**
 image.prototype['to_png_base64'] = image.prototype.to_png_base64 = /** @suppress {undefinedVars, duplicate} @this{Object} */function(compression_level) {
   var self = this.ptr;
   if (compression_level && typeof compression_level === 'object') compression_level = compression_level.ptr;
-  return UTF8ToString(_emscripten_bind_image_to_png_base64_1(self, compression_level));
+  return wrapPointer(_emscripten_bind_image_to_png_base64_1(self, compression_level), string);
 };;
 
   image.prototype['__destroy__'] = image.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
@@ -559,6 +559,37 @@ steganographer.prototype['gen_availability_map_image'] = steganographer.prototyp
   steganographer.prototype['__destroy__'] = steganographer.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
   var self = this.ptr;
   _emscripten_bind_steganographer___destroy___0(self);
+};
+// string
+/** @suppress {undefinedVars, duplicate} @this{Object} */function string() {
+  this.ptr = _emscripten_bind_string_string_0();
+  getCache(string)[this.ptr] = this;
+};;
+string.prototype = Object.create(WrapperObject.prototype);
+string.prototype.constructor = string;
+string.prototype.__class__ = string;
+string.__cache__ = {};
+Module['string'] = string;
+
+string.prototype['size'] = string.prototype.size = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return _emscripten_bind_string_size_0(self);
+};;
+
+string.prototype['at'] = string.prototype.at = /** @suppress {undefinedVars, duplicate} @this{Object} */function(idx) {
+  var self = this.ptr;
+  if (idx && typeof idx === 'object') idx = idx.ptr;
+  return _emscripten_bind_string_at_1(self, idx);
+};;
+
+string.prototype['data'] = string.prototype.data = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  return UTF8ToString(_emscripten_bind_string_data_0(self));
+};;
+
+  string.prototype['__destroy__'] = string.prototype.__destroy__ = /** @suppress {undefinedVars, duplicate} @this{Object} */function() {
+  var self = this.ptr;
+  _emscripten_bind_string___destroy___0(self);
 };
 // threshold_stdvector
 /** @suppress {undefinedVars, duplicate} @this{Object} */function threshold_stdvector() {

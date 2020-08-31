@@ -130,12 +130,6 @@ namespace xsteg
 			? 0 
 			: result - XSTEG_STEGANOGRAPHER_HEADER_SIZE;
     }
-    
-    // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ ATTENTION +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    // The following code is an absolute mess.
-    // There is just too much state floating around to cleanly separate it,
-    // so i've kept it separated into lambdas.
-    // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
     ien::image steganographer::encode(const uint8_t* data, size_t len, const encoding_options& opts) const
     {
@@ -418,13 +412,13 @@ namespace xsteg
         for(auto& th : thresholds)
         {
             auto img = gen_visual_data_image(th.type, th.inverted);
-            uint32_t* data_ptr = reinterpret_cast<uint32_t*>(img.data());
-            uint8_t thval = static_cast<uint8_t>(std::min(th.value * 255.0F, 255.0F));
-            for(size_t i = 0; i < img.pixel_count(); ++i)
+            uint8_t* data_ptr = img.data();
+            uint8_t thval = static_cast<uint8_t>(th.value * 255.0F);
+            for(size_t i = 0; i < img.pixel_count() * 4; i += 4)
             {
-                uint8_t pxval = static_cast<uint8_t>(data_ptr[i] >> 24);
-                uint32_t repl_val = (pxval >= thval) ? 0xFFFFFFFFu : 0x000000FFu;
-                result_ptr[i] &= repl_val;
+                uint8_t pxval = img.data()[i];
+                uint32_t repl_val = (0xFFFFFFFFu >> (24 * (pxval >= thval)));
+                result_ptr[i / 4] &= repl_val;
             }
         }
         return result;

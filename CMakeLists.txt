@@ -25,6 +25,9 @@ if(XSTEG2_ARCH_X86 AND NOT EMSCRIPTEN)
         message("Enabling SSE/AVX2 extensions (-mavx2)")
         add_definitions(-mavx2)
     endif()
+elseif(EMSCRIPTEN)
+    message("Enabling SSE/AVX2 extensions (-msimd128)")
+    add_definitions(-msimd128)
 endif()
 
 # Enable NEON code generation on ARM platforms, if enabled by the XSTEG2_ARM_ENABLE_NEON option

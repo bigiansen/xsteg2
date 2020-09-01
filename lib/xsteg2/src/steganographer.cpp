@@ -417,7 +417,7 @@ namespace xsteg
             for(size_t i = 0; i < img.pixel_count() * 4; i += 4)
             {
                 uint8_t pxval = img.data()[i];
-                uint32_t repl_val = (0xFFFFFFFFu >> (24 * (pxval >= thval)));
+                uint32_t repl_val = (0xFFFFFFFFu >> (24 * (pxval < thval)));
                 result_ptr[i / 4] &= repl_val;
             }
         }

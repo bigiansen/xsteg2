@@ -10,10 +10,13 @@ include(cmake/xsteg2.cmake)
 option(XSTEG2_BUILD_CLI_EXECUTABLE "Build CLI executable" On)
 option(XSTEG2_BUILD_WASM_LIBRARY "Build WASM/JS library" Off)
 option(XSTEG2_BUILD_TESTS "Build tests" On)
+option(XSTEG2_USE_CUSTOM_SIMD "Use custom SIMD implementations" On)
 
 XSTEG2_SET_SHARED_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/shared)
 XSTEG2_SET_STATIC_LIB_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/lib/static)
 XSTEG2_SET_EXECUTABLE_OUTPUT_DIR(${PROJECT_BINARY_DIR}/output/bin/xsteg2)
+
+option(LIEN_USE_CUSTOM_SIMD "Use custom SIMD implementations" ${XSTEG2_USE_CUSTOM_SIMD})
 
 # Enable SSE/AVX code generation on X86 platforms
 # This should go in a toolchain, but will remain here for the moment
